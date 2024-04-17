@@ -1,9 +1,13 @@
 {
   "name": "dev-classes",
-  "private": true,
+  "private": false,
   "author": "SinGlEBW",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SinGlEBW/dev-classes.git"
+  },
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "type": "module",
   "module": "./dist/index.js",
   "main": "./dist/index.js",
