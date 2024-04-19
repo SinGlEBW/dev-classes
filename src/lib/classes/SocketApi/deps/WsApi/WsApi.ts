@@ -16,7 +16,7 @@ export class WsApi extends DelaysPromise {
   state: WsApiStateDefaultI & WsApiStateSaveDefaultI = {
     statusConnect: "disconnect",
     ws: null,
-    url: process.env.REACT_APP_URL_WS as string,
+    url: '',
     isRequestArrSaveReq: false,
     arrSaveReq: [],
     subscribersEvents: {
