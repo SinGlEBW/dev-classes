@@ -103,7 +103,7 @@ export class DelaysPromise{
       */
 
       let isResponce = 1;
-
+      let errPayload = {status: false, msg: '',}
       promiseWatch()
       .then((data) => { console.log('DelaysPromise.oneOfPromise (promiseWatch ==> data)', data);
         if(isResponce === 1) {
@@ -114,6 +114,7 @@ export class DelaysPromise{
       .catch((err) => { 
         if(isResponce === 1) {
           isResponce = 0;
+          errPayload.msg = err
           reject(err);
         }
       })
@@ -122,7 +123,7 @@ export class DelaysPromise{
         if(isResponce === 1){ 
           isResponce = 0;
           if(typeof cbPotentialReject === 'function'){
-            reject({status: false, msg: '', ...cbPotentialReject()})
+            reject({status: false, msg: '', ...cbPotentialReject(errPayload)})
             return;
           }
           reject({status: false, msg: 'oneOfPromise reject'});
