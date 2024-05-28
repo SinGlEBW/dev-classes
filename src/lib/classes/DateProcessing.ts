@@ -347,11 +347,8 @@ export class DateProcessing {
     if(difference === 2){
       return 'Позавчера'
     }
-    console.dir(date);
-    const a = DateProcessing.correctionDate(date, {shortYear: true, withOutCurrentYear: option.withOutCurrentYear })
-    console.dir(a);
-    return a
-
+  
+    return DateProcessing.correctionDate(date, {shortYear: true, withOutCurrentYear: option.withOutCurrentYear })
   }
 }
 

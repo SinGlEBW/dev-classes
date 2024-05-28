@@ -62,7 +62,6 @@ export class DelaysPromise{
         getIsActiveEvent: () => options.isActive,
         stop: () => {
           const msg =  "Ручное завершение startActionEvery"
-          console.dir(`controlAction (stop): ${msg}`);
           options.isActive = false;
           clearInterval(idInterval);
           setId(null);
@@ -84,7 +83,7 @@ export class DelaysPromise{
       (isResponce === 1) && (isResponce = 0);
     })
   
-    let idInterval = setInterval(() => { console.dir('setInterval в oneOf');
+    let idInterval = setInterval(() => { 
       if(isResponce === 1){ potentialCaseCB(); }
       clearInterval(idInterval);
     }, second * 1000);
@@ -105,7 +104,7 @@ export class DelaysPromise{
       let isResponce = 1;
       let errPayload = {status: false, msg: '',}
       promiseWatch()
-      .then((data) => { console.log('DelaysPromise.oneOfPromise (promiseWatch ==> data)', data);
+      .then((data) => { 
         if(isResponce === 1) {
           isResponce = 0;
           resolve(data);
@@ -119,7 +118,7 @@ export class DelaysPromise{
         }
       })
     
-      let idInterval = setInterval(() => { console.log('DelaysPromise.oneOfPromise (interval ==> potentialCaseCB)', );
+      let idInterval = setInterval(() => { 
         if(isResponce === 1){ 
           isResponce = 0;
           if(typeof cbPotentialReject === 'function'){

@@ -1,6 +1,5 @@
 export class Utils {
   static events (status: 'add' | 'remove', who, entriesEvents, msg = '') {
-        
     console.log(`##########--------<{ ${status === 'add' ? 'Создаём' : 'Удаляем'} пачку ивентов ${msg}}>---------#########`);
     return new Promise((resolve, reject) => {
       let total = 0;

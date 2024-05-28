@@ -176,7 +176,10 @@ export class Color {
   }
   
   static rgbaToHexa(rgba: ColorRgba | ColorRgb) {
-    return "#" + rgba.map((v) => ("0" + v.toString(16)).slice(-2)).join("");
+    const copyRgba = [...rgba];
+    const alpha = copyRgba.pop();
+    const alphaHex = Math.round(Math.min(Math.max(alpha ?? 1, 0), 1) * 255);
+    return "#" + copyRgba.map((v) => ("0" + v.toString(16)).slice(-2)).join("") + alphaHex.toString(16);
   }
   
   static hslaStringToHexa(hsla: string) {
