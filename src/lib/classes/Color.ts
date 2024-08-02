@@ -1,6 +1,7 @@
 export type ColorRgba = [number, number, number, number];
 export type ColorRgb = [number, number, number];
 export type ColorHsla = Record<"h" | "s" | "l" | "a", number>;
+export type TypeBrightness_OR = "BT601" | "BT709" | "BT2020";
 
 export class Color {
   /*Проверить свои методы и возможно исключить т.к. функционал возможно повторяется */
@@ -133,10 +134,10 @@ export class Color {
       if (val.endsWith("%")) {
         return +val.slice(0, -1);
       }
-  
+
       return +val;
     });
-  
+
     return Color.hslaToRgba(arr[0], arr[1], arr[2], alpha);
   }
 
@@ -146,7 +147,7 @@ export class Color {
     if (hexa.length === 5 + offset) {
       hexa = (offset ? "#" : "") + "0" + hexa.slice(offset);
     }
-  
+
     if (hexa.length === 3 + offset) {
       for (let i = offset; i < hexa.length; ++i) {
         arr.push(parseInt(hexa[i] + hexa[i], 16));
@@ -155,41 +156,41 @@ export class Color {
       for (let i = offset; i < hexa.length - 1; ++i) {
         arr.push(parseInt(hexa[i] + hexa[i], 16));
       }
-  
+
       arr.push(parseInt(hexa[hexa.length - 1], 16));
     } else {
       for (let i = offset; i < hexa.length; i += 2) {
         arr.push(parseInt(hexa.slice(i, i + 2), 16));
       }
     }
-  
+
     return arr;
   }
-  
+
   static hexToRgb(hex: string) {
     return Color.hexaToRgba(hex.slice(0, 7)) as any as ColorRgb;
   }
-  
+
   static hexaToHsla(hexa: string) {
     const rgba = Color.hexaToRgba(hexa);
     return Color.rgbaToHsla(rgba[0], rgba[1], rgba[2], rgba[3]);
   }
-  
+
   static rgbaToHexa(rgba: ColorRgba | ColorRgb) {
     const copyRgba = [...rgba];
     const alpha = copyRgba.pop();
     const alphaHex = Math.round(Math.min(Math.max(alpha ?? 1, 0), 1) * 255);
     return "#" + copyRgba.map((v) => ("0" + v.toString(16)).slice(-2)).join("") + alphaHex.toString(16);
   }
-  
+
   static hslaStringToHexa(hsla: string) {
     return Color.rgbaToHexa(Color.hslaStringToRgba(hsla));
   }
-  
+
   static hslaStringToHex(hsla: string) {
     return Color.hslaStringToHexa(hsla).slice(0, -2);
   }
-  
+
   /**
    * @param weight [0, 1]
    */
@@ -200,24 +201,34 @@ export class Color {
         v2 = color2[i];
       out[i] = Math.floor(v2 + (v1 - v2) * weight);
     }
-  
+
     return out;
   }
-  
-  static computePerceivedBrightness(color: ColorRgb) {
-    return (color[0] * 0.2126 + color[1] * 0.7152 + color[2] * 0.0722) / 255;
+
+  static getRgbByTypeBrightness(type: TypeBrightness_OR){
+    const dataTypes = {
+      BT601: [0.299, 0.587, 0.114],
+      BT709: [0.2126, 0.7152, 0.0722],
+      BT2020: [0.2627, 0.678, 0.0593],
+    };
+    return dataTypes[type];
   }
-  
+
+  static computePerceivedBrightness(color: ColorRgb, type: TypeBrightness_OR = "BT709") {
+    const dataTypes = Color.getRgbByTypeBrightness(type);
+    return (color[0] * dataTypes[type][0] + color[1] * dataTypes[type][1] + color[2] * dataTypes[type][2]) / 255;
+  }
+
   static getAverageColor(color1: ColorRgb, color2: ColorRgb): ColorRgb {
     return color1.map((v, i) => Math.round((v + color2[i]) / 2)) as ColorRgb;
   }
-  
+
   static getAccentColor(baseHsv: number[], baseColor: ColorRgb, elementColor: ColorRgb): ColorRgb {
     const hsvTemp3 = Color.rgbToHsv(...baseColor);
     const hsvTemp4 = Color.rgbToHsv(...elementColor);
-  
+
     const dist = Math.min((1.5 * hsvTemp3[1]) / baseHsv[1], 1);
-  
+
     hsvTemp3[0] = Math.min(360, hsvTemp4[0] - hsvTemp3[0] + baseHsv[0]);
     hsvTemp3[1] = Math.min(1, (hsvTemp4[1] * baseHsv[1]) / hsvTemp3[1]);
     hsvTemp3[2] = Math.min(1, ((hsvTemp4[2] / hsvTemp3[2] + dist - 1) * baseHsv[2]) / dist);
@@ -226,51 +237,62 @@ export class Color {
     }
     return Color.hsvToRgb(...hsvTemp3);
   }
-  
+
   static changeColorAccent(baseHsv: number[], accentHsv: number[], color: ColorRgb, isDarkTheme: boolean) {
     const colorHsv = Color.rgbToHsv(...color);
-  
+
     const diffH = Math.min(Math.abs(colorHsv[0] - baseHsv[0]), Math.abs(colorHsv[0] - baseHsv[0] - 360));
     if (diffH > 30) {
       return color;
     }
-  
+
     const dist = baseHsv[1] ? Math.min((1.5 * colorHsv[1]) / baseHsv[1], 1) : 0;
-  
+
     colorHsv[0] = Math.min(360, colorHsv[0] + accentHsv[0] - baseHsv[0]);
     colorHsv[1] = baseHsv[1] ? Math.min(1, (colorHsv[1] * accentHsv[1]) / baseHsv[1]) : 0;
     colorHsv[2] = baseHsv[2] ? Math.min(1, colorHsv[2] * (1 - dist + (dist * accentHsv[2]) / baseHsv[2])) : 0;
-  
+
     let newColor = Color.hsvToRgb(...colorHsv);
-  
+
     const origBrightness = Color.computePerceivedBrightness(color);
     const newBrightness = Color.computePerceivedBrightness(newColor);
-  
+
     // We need to keep colors lighter in dark themes and darker in light themes
     const needRevertBrightness = isDarkTheme ? origBrightness > newBrightness : origBrightness < newBrightness;
-  
+
     if (needRevertBrightness) {
       const amountOfNew = 0.6;
       const fallbackAmount = ((1 - amountOfNew) * origBrightness) / newBrightness + amountOfNew;
       newColor = Color.changeBrightness(newColor, fallbackAmount);
     }
-  
+
     return newColor;
   }
-  
+
   static changeBrightness(color: ColorRgb, amount: number) {
     return color.map((v) => Color.clamp(Math.round(v * amount), 0, 255)) as ColorRgb;
   }
+
+  static hexBrightness(hex:string, amount: number, type: TypeBrightness_OR = 'BT709'):any {
+    const rgb = Color.hexToRgb(hex);
+    const dataTypes = Color.getRgbByTypeBrightness(type);
   
+    const rgbBrightness = Color.changeBrightness(rgb, amount);
+    const [r, g, b] = rgbBrightness;
+    const hexBrightness = Color.rgbToHex(r * dataTypes[0], g * dataTypes[1], b * dataTypes[2]);
+
+    return hexBrightness;
+  }
+
   static getHexColorFromTelegramColor(color: number) {
     const hex = (color < 0 ? 0xffffff + color : color).toString(16);
     return "#" + (hex.length >= 6 ? hex : "0".repeat(6 - hex.length) + hex);
   }
-  
+
   static getRgbColorFromTelegramColor(color: number) {
     return Color.hexToRgb(Color.getHexColorFromTelegramColor(color));
   }
-  
+
   static getColorsFromWallPaper(wallPaper) {
     return wallPaper.settings
       ? [
@@ -284,34 +306,33 @@ export class Color {
           .join(",")
       : "";
   }
-  
+
   static rgbaToRgb(rgba: ColorRgba, bg: ColorRgb): ColorRgb {
     const a = rgba[3];
     return rgba.slice(0, 3).map((color, idx) => {
       return Color.clamp(Math.round((a * (color / 255) + a * (bg[idx] / 255)) * 255), 0, 255);
     }) as ColorRgb;
   }
-  
-  static calculateLuminance(rgb: ColorRgb) {
+
+  static calculateLuminance(rgb: ColorRgb, type: TypeBrightness_OR = 'BT709') {
     const [r, g, b] = rgb;
-    const luminance = (0.2126 * r) / 255 + (0.7152 * g) / 255 + (0.0722 * b) / 255;
+    const dataTypes = Color.getRgbByTypeBrightness(type);
+    const luminance = (dataTypes[0] * r) / 255 + (dataTypes[1] * g) / 255 + (dataTypes[2] * b) / 255;
     return luminance;
   }
-  
+
   static getTextColor(luminance: number): ColorRgb {
     return luminance > 0.5 ? [0, 0, 0] : [255, 255, 255];
   }
-  
+
   static calculateOpacity(luminance: number, targetContrast: number) {
     const targetTextLuminance = luminance > 0.5 ? 0 : 1;
     const adaptiveOpacity = (luminance - targetTextLuminance + targetContrast) / targetContrast;
     const opacity = +Math.max(0.5, Math.min(0.64, adaptiveOpacity)).toFixed(2);
-  
+
     return opacity;
   }
   static clamp(v: number, min: number, max: number): number {
     return Math.min(max, Math.max(min, v));
   }
 }
-
-

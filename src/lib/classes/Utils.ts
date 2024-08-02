@@ -1,3 +1,5 @@
+import uuid4 from "uuid4";
+
 export class Utils {
   static events (status: 'add' | 'remove', who, entriesEvents, msg = '') {
     console.log(`##########--------<{ ${status === 'add' ? 'Создаём' : 'Удаляем'} пачку ивентов ${msg}}>---------#########`);
@@ -86,4 +88,5 @@ export class Utils {
     // ? Math.floor(Number(new Date(date))) <= Math.floor(Number(new Date(period)))
     // : Math.floor(Number(new Date(date))) >= Math.floor(Number(new Date(period)))
   }
+  static uuid4 = () => uuid4();
 }
