@@ -273,13 +273,13 @@ export class Color {
     return color.map((v) => Color.clamp(Math.round(v * amount), 0, 255)) as ColorRgb;
   }
 
-  static hexBrightness(hex:string, amount: number, type: TypeBrightness_OR = 'BT709'):any {
+  static hexBrightness(hex:string, amount: number):any {
     const rgb = Color.hexToRgb(hex);
-    const dataTypes = Color.getRgbByTypeBrightness(type);
+    // const dataTypes = Color.getRgbByTypeBrightness(type);
   
     const rgbBrightness = Color.changeBrightness(rgb, amount);
     const [r, g, b] = rgbBrightness;
-    const hexBrightness = Color.rgbToHex(r * dataTypes[0], g * dataTypes[1], b * dataTypes[2]);
+    const hexBrightness = Color.rgbToHex(r, g, b);
 
     return hexBrightness;
   }
