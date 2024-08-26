@@ -5,12 +5,15 @@ interface  StartActionEveryConfigI {
   watchIdInterval?(id:number | null):void;
   controlAction?(control:{ stop():void, getIsActiveEvent():boolean }):void
 }
-type Callback = () => boolean;
-type StartActionEveryType = (cb: Callback, config: StartActionEveryConfigI) => Promise<{status: boolean, msg: string}>
+
+
+export interface DelaysPromiseProps{
+  startActionEvery: (cb: () => boolean, config: StartActionEveryConfigI) => Promise<{status: boolean, msg: string}>
+}
 
 export class DelaysPromise{
 
-  startActionEvery:StartActionEveryType = (cb, config = { interval: 5000 }) => {
+  startActionEvery:DelaysPromiseProps['startActionEvery'] = (cb, config = { interval: 5000 }) => {
     const setId = (id) => {
       typeof config?.watchIdInterval === "function" &&  config?.watchIdInterval(id);
     };
@@ -131,5 +134,4 @@ export class DelaysPromise{
       }, second * 1000);
   })
 
- 
 }

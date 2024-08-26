@@ -1,7 +1,13 @@
-export type ColorRgba = [number, number, number, number];
-export type ColorRgb = [number, number, number];
-export type ColorHsla = Record<"h" | "s" | "l" | "a", number>;
-export type TypeBrightness_OR = "BT601" | "BT709" | "BT2020";
+
+type ColorRgb = [number, number, number];
+
+export interface ColorProps{
+  ColorRgb: ColorRgb;
+  ColorRgba: [...ColorRgb, number];
+  ColorHsla: Record<"h" | "s" | "l" | "a", number>;
+  TypeBrightness_OR:"BT601" | "BT709" | "BT2020"
+}
+
 
 export class Color {
   /*Проверить свои методы и возможно исключить т.к. функционал возможно повторяется */
@@ -42,14 +48,14 @@ export class Color {
    * @param v [0, 1]
    * @returns r, g, b in [0, 255]
    */
-  static hsvToRgb(h: number, s: number, v: number): ColorRgb {
+  static hsvToRgb(h: number, s: number, v: number): ColorProps['ColorRgb'] {
     const f = (n: number, k: number = (n + h / 60) % 6) => Math.round((v - v * s * Math.max(Math.min(k, 4 - k, 1), 0)) * 255);
     return [f(5), f(3), f(1)];
   }
   /**
    * @returns h [0, 360], s [0, 100], l [0, 100], a [0, 1]
    */
-  static rgbaToHsla(r: number, g: number, b: number, a: number = 1): ColorHsla {
+  static rgbaToHsla(r: number, g: number, b: number, a: number = 1): ColorProps['ColorHsla'] {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     r /= 255;
     g /= 255;
@@ -98,7 +104,7 @@ export class Color {
    * @param   {number}  l       The lightness [0, 1]
    * @return  {Array}           The RGB representation [0, 255]
    */
-  static hslaToRgba(h: number, s: number, l: number, a: number): ColorRgba {
+  static hslaToRgba(h: number, s: number, l: number, a: number): ColorProps['ColorRgba'] {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     h /= 360;
     s /= 100;
@@ -124,7 +130,7 @@ export class Color {
       b = hue2rgb(p, q, h - 1 / 3);
     }
 
-    return [r, g, b, a].map((v) => Math.round(v * 255)) as ColorRgba;
+    return [r, g, b, a].map((v) => Math.round(v * 255)) as ColorProps['ColorRgba'] ;
   }
 
   static hslaStringToRgba(hsla: string) {
@@ -142,7 +148,7 @@ export class Color {
   }
 
   static hexaToRgba(hexa: string) {
-    const arr: ColorRgba = [] as any;
+    const arr: ColorProps['ColorRgba'] = [] as any;
     const offset = hexa[0] === "#" ? 1 : 0;
     if (hexa.length === 5 + offset) {
       hexa = (offset ? "#" : "") + "0" + hexa.slice(offset);
@@ -168,7 +174,7 @@ export class Color {
   }
 
   static hexToRgb(hex: string) {
-    return Color.hexaToRgba(hex.slice(0, 7)) as any as ColorRgb;
+    return Color.hexaToRgba(hex.slice(0, 7)) as any as ColorProps['ColorRgb'];
   }
 
   static hexaToHsla(hexa: string) {
@@ -176,7 +182,7 @@ export class Color {
     return Color.rgbaToHsla(rgba[0], rgba[1], rgba[2], rgba[3]);
   }
 
-  static rgbaToHexa(rgba: ColorRgba | ColorRgb) {
+  static rgbaToHexa(rgba: ColorProps['ColorRgba']  | ColorProps['ColorRgb'] ) {
     const copyRgba = [...rgba];
     const alpha = copyRgba.pop();
     const alphaHex = Math.round(Math.min(Math.max(alpha ?? 1, 0), 1) * 255);
@@ -194,8 +200,8 @@ export class Color {
   /**
    * @param weight [0, 1]
    */
-  static mixColors(color1: ColorRgb, color2: ColorRgb, weight: number) {
-    const out = new Array<number>(3) as ColorRgb;
+  static mixColors(color1: ColorProps['ColorRgb'] , color2: ColorProps['ColorRgb'], weight: number) {
+    const out = new Array<number>(3) as ColorProps['ColorRgb'];
     for (let i = 0; i < 3; ++i) {
       const v1 = color1[i],
         v2 = color2[i];
@@ -205,7 +211,7 @@ export class Color {
     return out;
   }
 
-  static getRgbByTypeBrightness(type: TypeBrightness_OR){
+  static getRgbByTypeBrightness(type: ColorProps['TypeBrightness_OR']){
     const dataTypes = {
       BT601: [0.299, 0.587, 0.114],
       BT709: [0.2126, 0.7152, 0.0722],
@@ -214,16 +220,16 @@ export class Color {
     return dataTypes[type];
   }
 
-  static computePerceivedBrightness(color: ColorRgb, type: TypeBrightness_OR = "BT709") {
+  static computePerceivedBrightness(color: ColorProps['ColorRgb'], type: ColorProps['TypeBrightness_OR'] = "BT709") {
     const dataTypes = Color.getRgbByTypeBrightness(type);
     return (color[0] * dataTypes[type][0] + color[1] * dataTypes[type][1] + color[2] * dataTypes[type][2]) / 255;
   }
 
-  static getAverageColor(color1: ColorRgb, color2: ColorRgb): ColorRgb {
-    return color1.map((v, i) => Math.round((v + color2[i]) / 2)) as ColorRgb;
+  static getAverageColor(color1: ColorProps['ColorRgb'], color2: ColorProps['ColorRgb']): ColorProps['ColorRgb'] {
+    return color1.map((v, i) => Math.round((v + color2[i]) / 2)) as ColorProps['ColorRgb'];
   }
 
-  static getAccentColor(baseHsv: number[], baseColor: ColorRgb, elementColor: ColorRgb): ColorRgb {
+  static getAccentColor(baseHsv: number[], baseColor: ColorProps['ColorRgb'], elementColor: ColorProps['ColorRgb']): ColorProps['ColorRgb'] {
     const hsvTemp3 = Color.rgbToHsv(...baseColor);
     const hsvTemp4 = Color.rgbToHsv(...elementColor);
 
@@ -238,7 +244,7 @@ export class Color {
     return Color.hsvToRgb(...hsvTemp3);
   }
 
-  static changeColorAccent(baseHsv: number[], accentHsv: number[], color: ColorRgb, isDarkTheme: boolean) {
+  static changeColorAccent(baseHsv: number[], accentHsv: number[], color: ColorProps['ColorRgb'], isDarkTheme: boolean) {
     const colorHsv = Color.rgbToHsv(...color);
 
     const diffH = Math.min(Math.abs(colorHsv[0] - baseHsv[0]), Math.abs(colorHsv[0] - baseHsv[0] - 360));
@@ -269,11 +275,11 @@ export class Color {
     return newColor;
   }
 
-  static changeBrightness(color: ColorRgb, amount: number) {
-    return color.map((v) => Color.clamp(Math.round(v * amount), 0, 255)) as ColorRgb;
+  static changeBrightness(color: ColorProps['ColorRgb'], amount: number) {
+    return color.map((v) => Color.clamp(Math.round(v * amount), 0, 255)) as ColorProps['ColorRgb'];
   }
 
-  static hexBrightness(hex:string, amount: number):any {
+  static hexBrightness(hex:string, amount: number):string {
     const rgb = Color.hexToRgb(hex);
     // const dataTypes = Color.getRgbByTypeBrightness(type);
   
@@ -307,21 +313,21 @@ export class Color {
       : "";
   }
 
-  static rgbaToRgb(rgba: ColorRgba, bg: ColorRgb): ColorRgb {
+  static rgbaToRgb(rgba: ColorProps['ColorRgba'], bg: ColorProps['ColorRgb']): ColorProps['ColorRgb'] {
     const a = rgba[3];
     return rgba.slice(0, 3).map((color, idx) => {
       return Color.clamp(Math.round((a * (color / 255) + a * (bg[idx] / 255)) * 255), 0, 255);
-    }) as ColorRgb;
+    }) as ColorProps['ColorRgb'];
   }
 
-  static calculateLuminance(rgb: ColorRgb, type: TypeBrightness_OR = 'BT709') {
+  static calculateLuminance(rgb: ColorProps['ColorRgb'], type:ColorProps['TypeBrightness_OR'] = 'BT709') {
     const [r, g, b] = rgb;
     const dataTypes = Color.getRgbByTypeBrightness(type);
     const luminance = (dataTypes[0] * r) / 255 + (dataTypes[1] * g) / 255 + (dataTypes[2] * b) / 255;
     return luminance;
   }
 
-  static getTextColor(luminance: number): ColorRgb {
+  static getTextColor(luminance: number): ColorProps['ColorRgb'] {
     return luminance > 0.5 ? [0, 0, 0] : [255, 255, 255];
   }
 
