@@ -7,7 +7,7 @@ export type EventNameType = "msg" | "status";
 export type SubscribersEventsType = Record<EventNameType, any[]>;
 export type SubscriberType<T> = (msg: T) => void;
 
-type StatusConnectWsAPI = "pending" | "ready" | "error" | "close" | "disconnect";
+export type StatusConnectWsAPI = "pending" | "ready" | "error" | "close" | "disconnect";
 export interface WsApiStateDefaultI {
   statusConnect: StatusConnectWsAPI;
   ws: null | WebSocket;

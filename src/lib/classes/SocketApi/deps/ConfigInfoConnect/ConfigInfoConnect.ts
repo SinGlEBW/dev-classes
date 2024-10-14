@@ -1,3 +1,5 @@
+import type { ConfigInfoConnectI, OptionsConditionReConnect } from './ConfigInfoConnect.types';
+
 export class ConfigInfoConnect implements ConfigInfoConnectI {
   options = {
     stop: false

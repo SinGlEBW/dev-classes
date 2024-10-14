@@ -1,4 +1,4 @@
-import uuid4 from "uuid4";
+
 
 export class Utils {
   static events (status: 'add' | 'remove', who, entriesEvents, msg = '') {
@@ -28,7 +28,7 @@ export class Utils {
     
     })
   }
-  static sortDataByAlphabet = (arrData: any[], sortKey) => {
+  static sortDataByAlphabet = (arrData: {[key: string]: any}[], sortKey: string) => {
     arrData.sort((item1, item2) => (item2[sortKey].trim() < item1[sortKey].trim()) ? 1 : -1)
   }
 
@@ -88,5 +88,5 @@ export class Utils {
     // ? Math.floor(Number(new Date(date))) <= Math.floor(Number(new Date(period)))
     // : Math.floor(Number(new Date(date))) >= Math.floor(Number(new Date(period)))
   }
-  static uuid4 = () => uuid4();
+  static getEndsWithArr = (arr: any[], countEnd) => arr.slice(-countEnd);
 }

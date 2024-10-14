@@ -1,2 +1,2 @@
 export * from './WsApi';
-export * from './types.d';
+export * from './WsApi.types';

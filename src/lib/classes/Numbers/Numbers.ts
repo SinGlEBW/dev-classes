@@ -13,4 +13,8 @@ export class Numbers {
       console.error(error)
     }
   }
+  static randomNumber = () => {
+    const date = new Date();
+    return Math.floor(Math.random() * date.getTime())
+  }
 }

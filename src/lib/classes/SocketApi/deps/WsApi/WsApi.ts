@@ -1,7 +1,7 @@
-import { DelaysPromise } from "@classes/Delay";
+import { DelaysPromise } from "@classes/Delay/Delay";
 
-import { ConnectOptions_P, EventNameType, StatusConnectWsAPI, SubscriberType, WsApiStateDefaultI, WsApiStateSaveDefaultI } from "./types.d";
 import { InternetWatcher } from "../InternetWatcher/InternetWatcher";
+import { ConnectOptions_P, EventNameType, StatusConnectWsAPI, SubscriberType, WsApiStateDefaultI, WsApiStateSaveDefaultI } from "./WsApi.types";
 
 //INFO: Назначать функции стрелочными иначе this не читаем
 
@@ -119,4 +119,4 @@ export class WsApi extends DelaysPromise {
   };
 }
 
-// (window as any).SB = subscribersEvents;
+

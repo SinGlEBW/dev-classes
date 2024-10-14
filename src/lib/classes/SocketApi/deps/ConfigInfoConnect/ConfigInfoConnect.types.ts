@@ -1,7 +1,7 @@
-interface OptionsConditionReConnect {
+export interface OptionsConditionReConnect {
   stop: boolean;
 }
-interface ConfigInfoConnectI {
+export interface ConfigInfoConnectI {
   options: OptionsConditionReConnect;
   setConditionReConnect(options: Partial<OptionsConditionReConnect>): void;
 }
