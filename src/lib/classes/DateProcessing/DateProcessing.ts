@@ -31,6 +31,7 @@ export interface DateProcessingI{
   getRenderDate(a:string, b?:{withOutCurrentYear: boolean} ):'Сегодня' | 'Вчера' | 'Позавчера' | string 
   getCurrentDate():string 
   getDaysInMonth(a: number, b: number):number 
+  getCurrentYear():number 
 }
 
 
@@ -279,11 +280,12 @@ export class DateProcessing {
 
   static getCurrentDate:DateProcessingI['getCurrentDate'] = () => {
     const date = new Date();
-    const currentYear = date.getFullYear();
+    const currentYear = DateProcessing.getCurrentYear();
     const currentMonthDay = date.toJSON().split('T')[0].slice(5);
     const currentFullDate = `${currentYear}-${currentMonthDay}`;
     return currentFullDate;
   }
+  static getCurrentYear:DateProcessingI['getCurrentYear'] = () => new Date().getFullYear()
   static getDaysInMonth:DateProcessingI['getDaysInMonth'] = (month: number, year: number) => new Date(year, month, 0).getDate();
 }
 
