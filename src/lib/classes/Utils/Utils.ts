@@ -5,7 +5,6 @@ export class Utils {
     console.log(`##########--------<{ ${status === 'add' ? 'Создаём' : 'Удаляем'} пачку ивентов ${msg}}>---------#########`);
     return new Promise((resolve, reject) => {
       let total = 0;
-      // console.log('who ', who);
       for (let [keyEvent, watchEvent] of entriesEvents) {
         total++;
         if(status === 'add'){

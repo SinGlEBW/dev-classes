@@ -1,7 +1,7 @@
 import { DelaysPromise } from "@classes/Delay/Delay";
 
 import { InternetWatcher } from "../InternetWatcher/InternetWatcher";
-import { ConnectOptions_P, EventNameType, StatusConnectWsAPI, SubscriberType, WsApiStateDefaultI, WsApiStateSaveDefaultI } from "./WsApi.types";
+import { ConnectOptions_P, EventNames_OR, StatusConnect_OR, WsApiStateDefaultI, WsApiStateSaveDefaultI, type GetCbByKeyNameEvent } from "./WsApi.types";
 
 //INFO: Назначать функции стрелочными иначе this не читаем
 
@@ -30,7 +30,7 @@ export class WsApi extends DelaysPromise {
   totalInfoReqPromise: { action: string; reqId: string; resolve: any; reject: any }[] = [];
   private stateDefault = this.copyState(this.state);
 
-  setStatus = (status: StatusConnectWsAPI) => {
+  setStatus = (status: StatusConnect_OR) => {
     this.sendInformationToTheEvent("status", status);
     this.state.statusConnect = status;
   };
@@ -59,14 +59,14 @@ export class WsApi extends DelaysPromise {
     console.log("this >> close");
     this.setStatus("close");
   };
-
-  on<T>(eventName: EventNameType, cb: SubscriberType<T>) {
+ 
+  on<K extends EventNames_OR>(eventName: K, cb: GetCbByKeyNameEvent<K>) {
     this.state.subscribersEvents[eventName].push(cb);
     return () => {
       this.state.subscribersEvents[eventName] = this.state.subscribersEvents[eventName].filter((s) => s !== cb);
     };
   }
-  off<T>(eventName: EventNameType, cb: SubscriberType<T>) {
+  off<K extends EventNames_OR>(eventName: K, cb: GetCbByKeyNameEvent<K>) {
     this.state.subscribersEvents[eventName] = this.state.subscribersEvents[eventName].filter((s) => s !== cb);
   }
 

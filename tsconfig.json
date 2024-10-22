@@ -20,6 +20,7 @@
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@classes/*": ["src/lib/classes/*"],
+      "@lib": ["src/lib/index"],
     }
   },
   "include": ["src", "src/lib"]

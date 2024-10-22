@@ -21,6 +21,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "@classes": resolve(__dirname, './src/lib/classes'),
+      "@lib": resolve(__dirname, './src/lib/index'),
     }
   },
   server: {

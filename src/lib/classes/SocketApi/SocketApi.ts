@@ -1,11 +1,13 @@
+
 import uuid4 from "uuid4";
 
-import { ConnectOptions_P, EventNameType, SubscriberType, WsApi } from "./deps/WsApi";
+import { ConnectOptions_P, EventNames_OR, GetCbByKeyNameEvent, WsApi } from "./deps/WsApi";
 
 interface WatchI {
   watchTimeOffReConnect(info: { status: boolean; msg: string }): void;
   watchReConnect(status: boolean): void;
 }
+
 class Watch implements WatchI {
   watchTimeOffReConnect(info: { status: boolean; msg: string }): void {}
   watchReConnect(status: boolean): void {}
@@ -25,10 +27,10 @@ export class SocketApi {
   };
   private static stateDefault = SocketApi.copyState(SocketApi.state);
 
-  static on<T>(eventName: EventNameType, cb: SubscriberType<T>) {
+  static on<K extends EventNames_OR>(eventName: K, cb: GetCbByKeyNameEvent<K>) {
     return SocketApi.wsApi.on(eventName, cb);
   }
-  static off<T>(eventName: EventNameType, cb: SubscriberType<T>) {
+  static off<K extends EventNames_OR>(eventName: K, cb: GetCbByKeyNameEvent<K>) {
     SocketApi.wsApi.off(eventName, cb);
   }
   static setOptions = (option: ConnectOptions_P = SocketApi.wsApi.configWs) => {
@@ -42,7 +44,6 @@ export class SocketApi {
     SocketApi.wsApi.setStatus("close");
   }
   static disconnect() {
-    console.trace();
     if (!SocketApi.state.isDisconnect) {
       SocketApi.state.isDisconnect = true;
       console.log("DISCONNECT WS");
@@ -56,13 +57,11 @@ export class SocketApi {
 
   static send<ResType>(data: object) {
     return new Promise<ResType>((resolve, reject) => {
-      console.log("send: ", data);
       let { action, ...payload } = data as any;
       /*FIXME: Нужно слать id запроса, после ответ искать по id, потому что может быть запрошено несколько */
       if (!SocketApi.wsApi.state.ws || SocketApi.wsApi.state.ws.readyState !== 1) {
         if (!SocketApi.wsApi.state.arrSaveReq.some((item) => item.action === (data as any).action)) {
           SocketApi.wsApi.state.arrSaveReq.push(data);
-          console.log("сохранили запрос в arrSaveReq: ", SocketApi.wsApi.state.arrSaveReq);
         }
         return;
       }
@@ -107,7 +106,7 @@ export class SocketApi {
     SocketApi.wsApi.removeEvents();
   }
   private static createConnect() {
-    console.dir("CONNECT WS");
+    console.log("CONNECT WS");
     SocketApi.resetSocket();
     SocketApi.state.isDisconnect = false;
     SocketApi.wsApi.state.ws = new WebSocket(SocketApi.wsApi.state.url);
@@ -135,13 +134,14 @@ export class SocketApi {
               SocketApi.saveID.idConnect = id;
             },
             controlAction: ({ stop, getIsActiveEvent }) => {
-              console.dir("Вызван controlAction");
+              console.group("Вызван controlAction");
+                console.log("getIsActiveEvent не используется");
+              console.groupEnd();
               SocketApi.stopReConnect = () => {
                 stop();
               };
 
               // const idInterval = setInterval(() => {
-              //   console.log("controlAction (statusConnect): ", SocketApi.wsApi.state.statusConnect);
               //   const isActive = getIsActiveEvent()
               //   if(!SocketApi.wsApi.internet.isOnline){
               //     clearInterval(idInterval);
@@ -178,4 +178,6 @@ export class SocketApi {
   };
 }
 
-(window as any).SocketApi = SocketApi;
+
+
+

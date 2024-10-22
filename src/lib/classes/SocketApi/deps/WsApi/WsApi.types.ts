@@ -3,13 +3,37 @@ export interface ConnectOptions_P {
   // getInfoByTimeReConnect?: (info: { status: boolean; msg: string }) => void;
 }
 
-export type EventNameType = "msg" | "status";
-export type SubscribersEventsType = Record<EventNameType, any[]>;
-export type SubscriberType<T> = (msg: T) => void;
+export type EventNames_OR = "msg" | "status";
+export type StatusConnect_OR = "pending" | "ready" | "error" | "close" | "disconnect";
 
-export type StatusConnectWsAPI = "pending" | "ready" | "error" | "close" | "disconnect";
+
+
+interface EventByStatus {
+  event: 'status'
+  cb(status: StatusConnect_OR): void
+}
+
+interface EventByMSG {
+  event: 'msg'
+  cb(payload:any): void
+}
+
+interface EventsInfoByName_P{
+  status: EventByStatus;
+  msg: EventByMSG;
+}
+
+
+export type GetCbByKeyNameEvent<K extends EventNames_OR> = EventsInfoByName_P[K]['cb'];
+
+
+
+
+export type SubscribersEvents_P = Record<EventNames_OR, any[]>;
+
+
 export interface WsApiStateDefaultI {
-  statusConnect: StatusConnectWsAPI;
+  statusConnect: StatusConnect_OR;
   ws: null | WebSocket;
   url: string;
 }
@@ -17,5 +41,5 @@ export interface WsApiStateDefaultI {
 export interface WsApiStateSaveDefaultI {
   isRequestArrSaveReq: boolean;
   arrSaveReq: any[];
-  subscribersEvents: SubscribersEventsType;
+  subscribersEvents: SubscribersEvents_P;
 }
