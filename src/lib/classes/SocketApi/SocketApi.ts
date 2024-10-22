@@ -35,7 +35,7 @@ export class SocketApi {
   }
   static setOptions = (option: ConnectOptions_P = SocketApi.wsApi.configWs) => {
     if (!SocketApi.state.initConnect) {
-      SocketApi.wsApi.configWs = option;
+      SocketApi.wsApi.configWs = {...SocketApi.wsApi.configWs, ...option};
       SocketApi.wsApi.internet.addWatcherInternet();
     }
   };
@@ -57,7 +57,7 @@ export class SocketApi {
 
   static send<ResType>(data: object) {
     return new Promise<ResType>((resolve, reject) => {
-      let { action, ...payload } = data as any;
+      const { action, ...payload } = data as any;
       /*FIXME: Нужно слать id запроса, после ответ искать по id, потому что может быть запрошено несколько */
       if (!SocketApi.wsApi.state.ws || SocketApi.wsApi.state.ws.readyState !== 1) {
         if (!SocketApi.wsApi.state.arrSaveReq.some((item) => item.action === (data as any).action)) {
@@ -75,7 +75,7 @@ export class SocketApi {
       }
     });
   }
-
+  
   static connect() {
     SocketApi.createConnect();
   }
@@ -109,7 +109,7 @@ export class SocketApi {
     console.log("CONNECT WS");
     SocketApi.resetSocket();
     SocketApi.state.isDisconnect = false;
-    SocketApi.wsApi.state.ws = new WebSocket(SocketApi.wsApi.state.url);
+    SocketApi.wsApi.state.ws = new WebSocket(SocketApi.wsApi.configWs.url);
     SocketApi.wsApi.setStatus("pending");
     SocketApi.wsApi.addEvents();
   }
@@ -129,7 +129,7 @@ export class SocketApi {
           },
           {
             interval: SocketApi.wsApi.configWs.timeReConnect,
-            countAction: 5,
+            countAction: SocketApi.wsApi.configWs.numberOfRepit,
             watchIdInterval: (id) => {
               SocketApi.saveID.idConnect = id;
             },
@@ -177,7 +177,4 @@ export class SocketApi {
     SocketApi.state.isReConnect = false;
   };
 }
-
-
-
 

@@ -10,13 +10,14 @@ export class WsApi extends DelaysPromise {
 
   configWs: ConnectOptions_P = {
     timeReConnect: 5000,
+    numberOfRepit: 5,
+    url: '',
   };
   internet = new InternetWatcher();
 
   state: WsApiStateDefaultI & WsApiStateSaveDefaultI = {
     statusConnect: "disconnect",
     ws: null,
-    url: '',
     isRequestArrSaveReq: false,
     arrSaveReq: [],
     subscribersEvents: {
@@ -72,19 +73,19 @@ export class WsApi extends DelaysPromise {
 
   msgHandler = (e) => {
     //TODO:
-    let data = JSON.parse(e.data ? e.data : "{}");
+    const data = JSON.parse(e.data ? e.data : "{}");
 
     if ("action" in data && this.state.arrSaveReq.length) {
-      let findInx = this.state.arrSaveReq.findIndex((item) => item.action === data.action);
+      const findInx = this.state.arrSaveReq.findIndex((item) => item.action === data.action);
       if (~findInx) this.state.arrSaveReq.splice(findInx, 1);
     }
     if (!this.state.arrSaveReq.length && this.state.isRequestArrSaveReq) this.state.isRequestArrSaveReq = false;
 
     try {
-      let { action } = data;
+      const { action } = data;
 
       //FIXME: Пока ориентируемся по action. Нужно на сервер отсылать reqId и получать для точного ориентира промисов
-      let editTotalInfoReqPromise: any[] = [];
+      const editTotalInfoReqPromise: any[] = [];
       for (let i = 0; i < this.totalInfoReqPromise.length; i++) {
         const itemReq = this.totalInfoReqPromise[i];
         if (itemReq.action !== action) {

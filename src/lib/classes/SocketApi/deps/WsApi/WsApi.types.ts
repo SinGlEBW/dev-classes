@@ -1,5 +1,7 @@
 export interface ConnectOptions_P {
+  url: string;
   timeReConnect: number;
+  numberOfRepit?: number;
   // getInfoByTimeReConnect?: (info: { status: boolean; msg: string }) => void;
 }
 
@@ -35,7 +37,7 @@ export type SubscribersEvents_P = Record<EventNames_OR, any[]>;
 export interface WsApiStateDefaultI {
   statusConnect: StatusConnect_OR;
   ws: null | WebSocket;
-  url: string;
+
 }
 
 export interface WsApiStateSaveDefaultI {
