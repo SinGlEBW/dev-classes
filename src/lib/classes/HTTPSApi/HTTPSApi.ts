@@ -1,6 +1,6 @@
 import { apiRequest, RejectRequestInServer_P, type ResolveRequestInServer_P } from './deps/apiRequest/apiRequest';
 import type { FetchCommonPayloadHTTPSApi, RequestPayloadHTTPSApi, ResponseErrorHTTPSApi } from './HTTPSApi.types';
-
+export * from './HTTPSApi.types';
 
 
 export class HTTPSApi{

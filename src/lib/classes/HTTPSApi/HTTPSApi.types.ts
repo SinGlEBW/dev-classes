@@ -7,8 +7,8 @@ export interface FetchCommonPayloadHTTPSApi extends FetchCommonApiRequest, Pick<
   isReload: boolean;
 }
 
-export type ResponseErrorHTTPSApi = FetchCommonPayloadHTTPSApi & Pick<RejectRequestInServer_P, 'msg' | 'errExt'>;
-export type RequestPayloadHTTPSApi = { keyAction: FetchCommonPayloadHTTPSApi['keyAction']; request: { url: string } & RequestOptions_P }
+export interface ResponseErrorHTTPSApi extends FetchCommonPayloadHTTPSApi, Pick<RejectRequestInServer_P, 'msg' | 'errExt'> {}
+export interface RequestPayloadHTTPSApi { keyAction: FetchCommonPayloadHTTPSApi['keyAction']; request: { url: string } & RequestOptions_P }
 
 
 declare global {

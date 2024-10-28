@@ -8,10 +8,6 @@ import { Utils } from '@classes/Utils/Utils';
 
 
 export * from "./types/apiRequest.types";
-//INFO: внесены изменения 28.10
-/*
-  Добавлено объединение передаваемых option через deepMerge 
-*/
 
 export interface FetchCommonApiRequest {
   statusCode: number;
@@ -53,7 +49,7 @@ export class apiRequest {
         headers: {
           cookie: apiRequest.getToken(),
         },
-        timeout: 30.0,
+        timeout: 60000,
       };
 
       const requestOptions = Utils.deepMerge(defaultRequestOptions, options);
@@ -62,7 +58,7 @@ export class apiRequest {
         const { http } = window?.cordova?.plugin;
 
         http.setDataSerializer("json");
-        http.setRequestTimeout(requestOptions.timeout);
+        http.setRequestTimeout(Number(requestOptions.timeout) / 1000);
 
         apiRequest.registerRequest.setList({ url, options: requestOptions });
         http.sendRequest(
