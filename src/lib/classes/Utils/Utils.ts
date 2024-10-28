@@ -88,4 +88,21 @@ export class Utils {
     // : Math.floor(Number(new Date(date))) >= Math.floor(Number(new Date(period)))
   }
   static getEndsWithArr = (arr: any[], countEnd) => arr.slice(-countEnd);
+  
+  static deepMerge = <T extends object = object>(...itemsOb: T[]): T => {
+    const payload: any = {};
+    const merger = (obj: any) => {
+      for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+          //Точно определяет тип нежели typeof в котором приходиться писать !== null && Array.isArray()
+          Object.prototype.toString.call(obj[key]) === "[object Object]" ? (payload[key] = Utils.deepMerge(payload[key], obj[key])) : (payload[key] = obj[key]);
+        }
+      }
+    };
+  
+    for (let i = 0; i < itemsOb.length; i++) {
+      merger(itemsOb[i]);
+    }
+    return payload;
+  };
 }
