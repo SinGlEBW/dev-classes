@@ -53,7 +53,7 @@ export class apiRequest {
       };
 
       const requestOptions = Utils.deepMerge(defaultRequestOptions, options);
-      console.dir(requestOptions);
+  
       if (window?.cordova && window?.cordova?.plugin?.http) {
         const { http } = window?.cordova?.plugin;
 

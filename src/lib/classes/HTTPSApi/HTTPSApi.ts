@@ -44,7 +44,6 @@ export class HTTPSApi{
             resolve(successPayload);
           })
           .catch((dataErr: RejectRequestInServer_P) => {
-            
             const errorPayload:ResponseErrorHTTPSApi = { 
               isReq: false, isReload: false, keyAction, ...dataErr, 
             };
