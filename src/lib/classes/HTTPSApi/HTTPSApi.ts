@@ -28,7 +28,7 @@ export class HTTPSApi{
         isErr: !isNetwork,
         msg: isNetwork ? "" : "Нет интернета",
         isReq: isNetwork,
-        statusCode: 520,
+        statusCode: !isNetwork ? 520 : 0,
         isReload: false
       };
       
@@ -37,8 +37,8 @@ export class HTTPSApi{
         apiRequest
           .requestInServer<any>(url, other)
           .then((response) => {//data, res, statusCode, url
-            const successPayload:FetchCommonPayloadHTTPSApi & ResolveRequestInServer_P<Result> = { 
-              isReq: false, isReload: true, isErr: false, keyAction, ...response
+            const successPayload:FetchCommonPayloadHTTPSApi & ResolveRequestInServer_P<Result> & Pick<RejectRequestInServer_P, 'msg'> = { 
+              isReq: false, isReload: true, isErr: false, keyAction, msg: '', ...response
             }
             setStatusFetch(successPayload);
             resolve(successPayload);
