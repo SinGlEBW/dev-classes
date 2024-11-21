@@ -1,6 +1,5 @@
 
 import uuid4 from "uuid4";
-
 import { ConnectOptions_P, EventNames_OR, GetCbByKeyNameEvent, WsApi } from "./deps/WsApi";
 
 interface WatchI {
@@ -13,9 +12,30 @@ class Watch implements WatchI {
   watchReConnect(status: boolean): void {}
 }
 
+// class EventEmitter{
+//   registerEvents = {}
+
+//   on(name, cb){
+//       if(!this.registerEvents[name]) this.registerEvents[name] = [];
+//       this.registerEvents[name].push(cb)
+//   }
+//   once(name, cb){
+//     if(!this.registerEvents[name]) this.registerEvents[name] = [];
+//     this.registerEvents[name].push(cb)
+// }
+//   emit(name, data?: any){
+//       const cbs = this.registerEvents[name]
+//       if(cbs){
+//           cbs.forEach(cb => cb(data))
+//       }
+//   }
+// }
+
+
 export class SocketApi {
   private static wsApi = new WsApi();
   private static watch = new Watch();
+ 
   static state = {
     isDisconnect: true,
     initConnect: false,
@@ -56,27 +76,28 @@ export class SocketApi {
     }
   }
 
-  static send<ResType>(data: object) {
-    return new Promise<ResType>((resolve, reject) => {
+  static send<ResType>(data: object, cbSyccess?:(data: ResType) => void, cbError?: (err: Error) => void) {
+    
       const { action, ...payload } = data as any;
+      const reqId = uuid4();
+
+      SocketApi.wsApi.setRequestSave({ 
+        reqId,
+        payload: {action, ...payload},
+        resolve: cbSyccess, reject: cbError
+      })
       /*FIXME: Нужно слать id запроса, после ответ искать по id, потому что может быть запрошено несколько */
       if (!SocketApi.wsApi.state.ws || SocketApi.wsApi.state.ws.readyState !== 1) {
-        if (!SocketApi.wsApi.state.arrSaveReq.some((item) => item.action === (data as any).action)) {
-          SocketApi.wsApi.state.arrSaveReq.push(data);
           console.log('Нет подключения к сокету. Данные запроса сохранены', SocketApi.wsApi.state.arrSaveReq);
-        }
         return;
       }
 
-      const reqId = uuid4();
-      SocketApi.wsApi.totalInfoReqPromise.push({ action, reqId, resolve, reject });
+ 
       SocketApi.wsApi.state.ws?.send(JSON.stringify(data));
 
-      if (SocketApi.wsApi.state.arrSaveReq.length && !SocketApi.wsApi.state.isRequestArrSaveReq) {
-        SocketApi.wsApi.state.isRequestArrSaveReq = true;
-      }
-    });
   }
+
+
   
   static connect() {
     SocketApi.createConnect();
@@ -91,7 +112,7 @@ export class SocketApi {
     //TODO: придумать как получить время запроса. Нужно ориентироваться на action ответа что бы понимать ответ данного сообщения
   }
 
-  static getEndReq = () => SocketApi.wsApi.state.arrSaveReq;
+  static getRequestSave = SocketApi.wsApi.getRequestSave;
   /*------------------------------------------------------------------------------------------------------*/
   static watchReConnect(cb: WatchI["watchReConnect"]) {
     SocketApi.watch.watchReConnect = cb;
@@ -124,6 +145,7 @@ export class SocketApi {
         .startActionEvery(
           () => {
             if (SocketApi.wsApi.state.statusConnect === "ready") {
+              console.dir('Подключение установлено');
               return true;
             }
             SocketApi.createConnect();

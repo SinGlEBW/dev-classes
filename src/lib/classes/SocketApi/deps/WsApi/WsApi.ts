@@ -25,10 +25,7 @@ export class WsApi extends DelaysPromise {
       status: [],
     },
   };
-  // saveState: WsApiStateSaveDefaultI = {
-  
-  // };
-  totalInfoReqPromise: { action: string; reqId: string; resolve: any; reject: any }[] = [];
+
   private stateDefault = this.copyState(this.state);
 
   setStatus = (status: StatusConnect_OR) => {
@@ -54,6 +51,14 @@ export class WsApi extends DelaysPromise {
   openHandler = () => {
     console.log("this >> open");
     this.setStatus("ready");
+    const requestSave = this.getRequestSave();
+    if(requestSave.length){
+      for (let i = 0; i < requestSave.length; i++) {
+        const itemRequestSave = requestSave[i];
+        this.state.ws?.send(JSON.stringify(itemRequestSave.payload));
+      } 
+    }
+
   };
 
   closeHandler = () => {
@@ -72,29 +77,22 @@ export class WsApi extends DelaysPromise {
   }
 
   msgHandler = (e) => {
-    //TODO:
+ 
     const data = JSON.parse(e.data ? e.data : "{}");
 
-    if ("action" in data && this.state.arrSaveReq.length) {
-      const findInx = this.state.arrSaveReq.findIndex((item) => item.action === data.action);
-      if (~findInx) this.state.arrSaveReq.splice(findInx, 1);
-    }
-    if (!this.state.arrSaveReq.length && this.state.isRequestArrSaveReq) this.state.isRequestArrSaveReq = false;
-
+    // if ("action" in data && this.state.arrSaveReq.length) {
+    //   const findInx = this.state.arrSaveReq.findIndex((item) => item. action === data.action);
+    //   if (~findInx) this.state.arrSaveReq.splice(findInx, 1);
+    // }
+  
+    
+    // if (!this.state.arrSaveReq.length && this.state.isRequestArrSaveReq) this.state.isRequestArrSaveReq = false;
+    
+    
     try {
       const { action } = data;
+      action && this.setResponceInReqSave(data);
 
-      //FIXME: Пока ориентируемся по action. Нужно на сервер отсылать reqId и получать для точного ориентира промисов
-      const editTotalInfoReqPromise: any[] = [];
-      for (let i = 0; i < this.totalInfoReqPromise.length; i++) {
-        const itemReq = this.totalInfoReqPromise[i];
-        if (itemReq.action !== action) {
-          editTotalInfoReqPromise.push(itemReq);
-        } else {
-          itemReq.resolve && itemReq.resolve(data);
-        }
-      }
-      this.totalInfoReqPromise = editTotalInfoReqPromise;
       this.sendInformationToTheEvent('msg', data);
     } catch (error) {
       this.sendInformationToTheEvent('msg', JSON.parse("{}"));
@@ -118,6 +116,40 @@ export class WsApi extends DelaysPromise {
   private sendInformationToTheEvent = (nameEvent: keyof typeof this.state.subscribersEvents, data) => {
     this.state.subscribersEvents[nameEvent]?.forEach((cb) => cb(data));
   };
+
+  setRequestSave(reqInfo: typeof this.state.arrSaveReq[number]) {
+    if ("action" in reqInfo.payload) {
+      const findItemInx = this.state.arrSaveReq.findIndex((item) => item.payload.action === reqInfo.payload.action);
+      if (~findItemInx) {
+        this.state.arrSaveReq[findItemInx] = reqInfo;
+      }else{
+        this.state.arrSaveReq.push(reqInfo);
+      }
+    }
+  }
+  // removeItemRequestSave(action: string) {
+  //   const newTotalRequestSave = this.state.arrSaveReq.filter((item) => item.payload?.action !== action);
+  //   this.state.arrSaveReq = newTotalRequestSave
+  // }
+  getRequestSave() {
+    return this.state.arrSaveReq
+  }
+  setResponceInReqSave(responce: {action: string, [key: string]: any}) {
+    
+    const requestSave = this.getRequestSave();
+      const filterArrSaveReq: any[] = [];
+      for (let i = 0; i < requestSave.length; i++) {
+        const itemReq = requestSave[i];
+        if (itemReq.payload.action !== responce.action) {
+          filterArrSaveReq.push(itemReq);
+        } else {
+          itemReq.resolve && itemReq.resolve(responce);
+        }
+      }
+
+      this.state.arrSaveReq = filterArrSaveReq;
+      console.log('filterArrSaveReq', filterArrSaveReq)
+  }
 }
 
 
