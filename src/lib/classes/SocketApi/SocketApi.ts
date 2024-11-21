@@ -35,6 +35,7 @@ export class SocketApi {
   }
   static setOptions = (option: ConnectOptions_P = SocketApi.wsApi.configWs) => {
     if (!SocketApi.state.initConnect) {
+      SocketApi.state.initConnect = true;
       SocketApi.wsApi.configWs = {...SocketApi.wsApi.configWs, ...option};
       SocketApi.wsApi.internet.addWatcherInternet();
     }
@@ -62,6 +63,7 @@ export class SocketApi {
       if (!SocketApi.wsApi.state.ws || SocketApi.wsApi.state.ws.readyState !== 1) {
         if (!SocketApi.wsApi.state.arrSaveReq.some((item) => item.action === (data as any).action)) {
           SocketApi.wsApi.state.arrSaveReq.push(data);
+          console.log('Нет подключения к сокету. Данные запроса сохранены', SocketApi.wsApi.state.arrSaveReq);
         }
         return;
       }
