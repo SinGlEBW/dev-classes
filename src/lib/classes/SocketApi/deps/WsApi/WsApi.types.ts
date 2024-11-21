@@ -42,6 +42,6 @@ export interface WsApiStateDefaultI {
 
 export interface WsApiStateSaveDefaultI {
   isRequestArrSaveReq: boolean;
-  arrSaveReq: {payload: {action: string, [key: string]: any}, reqId: string, resolve: any, reject: any}[];
+  arrSaveReq: {payload: {action: string, [key: string]: any}, reqId: string, cb: any}[];
   subscribersEvents: SubscribersEvents_P;
 }

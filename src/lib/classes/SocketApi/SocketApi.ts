@@ -76,7 +76,7 @@ export class SocketApi {
     }
   }
 
-  static send<ResType>(data: object, cbSyccess?:(data: ResType) => void, cbError?: (err: Error) => void) {
+  static send<ResType>(data: object, cb?:(data: ResType) => void, cbError?: (err: Error) => void) {
     
       const { action, ...payload } = data as any;
       const reqId = uuid4();
@@ -84,7 +84,7 @@ export class SocketApi {
       SocketApi.wsApi.setRequestSave({ 
         reqId,
         payload: {action, ...payload},
-        resolve: cbSyccess, reject: cbError
+        cb
       })
       /*FIXME: Нужно слать id запроса, после ответ искать по id, потому что может быть запрошено несколько */
       if (!SocketApi.wsApi.state.ws || SocketApi.wsApi.state.ws.readyState !== 1) {

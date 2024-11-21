@@ -143,7 +143,7 @@ export class WsApi extends DelaysPromise {
         if (itemReq.payload.action !== responce.action) {
           filterArrSaveReq.push(itemReq);
         } else {
-          itemReq.resolve && itemReq.resolve(responce);
+          itemReq.cb && itemReq.cb(responce);
         }
       }
 
