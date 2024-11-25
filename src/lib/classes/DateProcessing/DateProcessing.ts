@@ -287,6 +287,21 @@ export class DateProcessing {
   }
   static getCurrentYear:DateProcessingI['getCurrentYear'] = () => new Date().getFullYear()
   static getDaysInMonth:DateProcessingI['getDaysInMonth'] = (month: number, year: number) => new Date(year, month, 0).getDate();
+  /**
+   * 
+   * @param date example: '2022-01-01'
+   * @param config example: {day: 1, month: 1, year: 1}
+   * @returns example: '2023-02-02'
+   */
+  static getDateDeviation = (date: string, config: Partial<Record<"day" | "month" | "year", number>>) => {
+    const correctDate = DateProcessing.correctionDataISO8601(date);
+    const d = new Date(correctDate);
+    const { day, month, year } = config;
+    year && d.setFullYear(d.getFullYear() + year);
+    month && d.setMonth(d.getMonth() + month);
+    day && d.setDate(d.getDate() + day);
+    return d.toISOString().slice(0, 10);
+  };
 }
 
 /*-------------------------------------------------------------------------------------------------------------------------------------------*/ 

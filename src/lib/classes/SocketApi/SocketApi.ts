@@ -1,4 +1,3 @@
-
 import uuid4 from "uuid4";
 import { ConnectOptions_P, EventNames_OR, GetCbByKeyNameEvent, WsApi } from "./deps/WsApi";
 
@@ -31,11 +30,10 @@ class Watch implements WatchI {
 //   }
 // }
 
-
 export class SocketApi {
   private static wsApi = new WsApi();
   private static watch = new Watch();
- 
+
   static state = {
     isDisconnect: true,
     initConnect: false,
@@ -56,7 +54,7 @@ export class SocketApi {
   static setOptions = (option: ConnectOptions_P = SocketApi.wsApi.configWs) => {
     if (!SocketApi.state.initConnect) {
       SocketApi.state.initConnect = true;
-      SocketApi.wsApi.configWs = {...SocketApi.wsApi.configWs, ...option};
+      SocketApi.wsApi.configWs = { ...SocketApi.wsApi.configWs, ...option };
       SocketApi.wsApi.internet.addWatcherInternet();
     }
   };
@@ -76,29 +74,25 @@ export class SocketApi {
     }
   }
 
-  static send<ResType>(data: object, cb?:(data: ResType) => void, cbError?: (err: Error) => void) {
-    
-      const { action, ...payload } = data as any;
-      const reqId = uuid4();
+  static send<ResType>(data: object, cb?: (data: ResType) => void) {
+    const { action, ...payload } = data as any;
 
-      SocketApi.wsApi.setRequestSave({ 
-        reqId,
-        payload: {action, ...payload},
-        cb
-      })
-      /*FIXME: Нужно слать id запроса, после ответ искать по id, потому что может быть запрошено несколько */
-      if (!SocketApi.wsApi.state.ws || SocketApi.wsApi.state.ws.readyState !== 1) {
-          console.log('Нет подключения к сокету. Данные запроса сохранены', SocketApi.wsApi.state.arrSaveReq);
-        return;
-      }
+    const reqId = uuid4();
+    SocketApi.wsApi.setRequestSave({
+      reqId,
+      payload: { action, ...payload },
+      cb,
+    });
 
- 
-      SocketApi.wsApi.state.ws?.send(JSON.stringify(data));
+    /*FIXME: Нужно слать id запроса, после ответ искать по id, потому что может быть запрошено несколько */
+    if (!SocketApi.wsApi.state.ws || SocketApi.wsApi.state.ws.readyState !== 1) {
+      console.log("Нет подключения к сокету");
+      return;
+    }
 
+    SocketApi.wsApi.state.ws?.send(JSON.stringify(data));
   }
 
-
-  
   static connect() {
     SocketApi.createConnect();
   }
@@ -145,7 +139,7 @@ export class SocketApi {
         .startActionEvery(
           () => {
             if (SocketApi.wsApi.state.statusConnect === "ready") {
-              console.dir('Подключение установлено');
+              console.dir("Подключение установлено");
               return true;
             }
             SocketApi.createConnect();
@@ -159,7 +153,7 @@ export class SocketApi {
             },
             controlAction: ({ stop, getIsActiveEvent }) => {
               console.group("Вызван controlAction");
-                console.log("getIsActiveEvent не используется");
+              console.log("getIsActiveEvent не используется");
               console.groupEnd();
               SocketApi.stopReConnect = () => {
                 stop();
@@ -193,7 +187,7 @@ export class SocketApi {
   };
 
   private static setInfoConnect = (info) => {
-    if(!info.status){
+    if (!info.status) {
       SocketApi.close();
     }
     SocketApi.watch.watchTimeOffReConnect(info);
@@ -201,4 +195,3 @@ export class SocketApi {
     SocketApi.state.isReConnect = false;
   };
 }
-

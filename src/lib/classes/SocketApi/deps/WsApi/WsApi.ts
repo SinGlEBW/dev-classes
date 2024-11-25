@@ -18,7 +18,6 @@ export class WsApi extends DelaysPromise {
   state: WsApiStateDefaultI & WsApiStateSaveDefaultI = {
     statusConnect: "disconnect",
     ws: null,
-    isRequestArrSaveReq: false,
     arrSaveReq: [],
     subscribersEvents: {
       msg: [],
@@ -51,14 +50,15 @@ export class WsApi extends DelaysPromise {
   openHandler = () => {
     console.log("this >> open");
     this.setStatus("ready");
-    const requestSave = this.getRequestSave();
-    if(requestSave.length){
-      for (let i = 0; i < requestSave.length; i++) {
-        const itemRequestSave = requestSave[i];
-        this.state.ws?.send(JSON.stringify(itemRequestSave.payload));
-      } 
-    }
 
+    // const requestSave = this.getRequestSave();
+    // if(requestSave.length){
+    //   for (let i = 0; i < requestSave.length; i++) {
+    //     const itemRequestSave = requestSave[i];
+    //     this.state.ws?.send(JSON.stringify(itemRequestSave.payload));
+    //     itemRequestSave?.payload?.action && this.removeRequestItemSave(itemRequestSave?.payload?.action);
+    //   } 
+    // }
   };
 
   closeHandler = () => {
@@ -80,14 +80,6 @@ export class WsApi extends DelaysPromise {
  
     const data = JSON.parse(e.data ? e.data : "{}");
 
-    // if ("action" in data && this.state.arrSaveReq.length) {
-    //   const findInx = this.state.arrSaveReq.findIndex((item) => item. action === data.action);
-    //   if (~findInx) this.state.arrSaveReq.splice(findInx, 1);
-    // }
-  
-    
-    // if (!this.state.arrSaveReq.length && this.state.isRequestArrSaveReq) this.state.isRequestArrSaveReq = false;
-    
     
     try {
       const { action } = data;
@@ -127,10 +119,11 @@ export class WsApi extends DelaysPromise {
       }
     }
   }
-  // removeItemRequestSave(action: string) {
-  //   const newTotalRequestSave = this.state.arrSaveReq.filter((item) => item.payload?.action !== action);
-  //   this.state.arrSaveReq = newTotalRequestSave
-  // }
+
+  removeRequestItemSave(action: string) {
+    const newTotalRequestSave = this.state.arrSaveReq.filter((item) => item.payload?.action !== action);
+    this.state.arrSaveReq = newTotalRequestSave
+  }
   getRequestSave() {
     return this.state.arrSaveReq
   }
