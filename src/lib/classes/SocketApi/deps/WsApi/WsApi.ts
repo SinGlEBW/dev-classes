@@ -27,6 +27,7 @@ export class WsApi extends DelaysPromise {
 
   private stateDefault = this.copyState(this.state);
 
+  getStatus = () => this.state.statusConnect;
   setStatus = (status: StatusConnect_OR) => {
     this.sendInformationToTheEvent("status", status);
     this.state.statusConnect = status;

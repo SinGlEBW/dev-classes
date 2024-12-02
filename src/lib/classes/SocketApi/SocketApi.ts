@@ -30,6 +30,7 @@ class Watch implements WatchI {
 //   }
 // }
 
+
 export class SocketApi {
   private static wsApi = new WsApi();
   private static watch = new Watch();
@@ -138,7 +139,7 @@ export class SocketApi {
       SocketApi.wsApi
         .startActionEvery(
           () => {
-            if (SocketApi.wsApi.state.statusConnect === "ready") {
+            if (SocketApi.wsApi.getStatus() === "ready") {
               console.dir("Подключение установлено");
               return true;
             }
@@ -194,4 +195,6 @@ export class SocketApi {
     SocketApi.watch.watchReConnect(false);
     SocketApi.state.isReConnect = false;
   };
+
+  static getStatus = () => SocketApi.wsApi.getStatus();
 }
