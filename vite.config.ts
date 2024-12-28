@@ -25,8 +25,10 @@ export default defineConfig({
     }
   },
   server: {
-    open: true
+    open: true,
+    
   },
+  
   build: {
     copyPublicDir: false,
     lib: {

@@ -10,6 +10,11 @@ export interface FetchCommonPayloadHTTPSApi extends FetchCommonApiRequest, Pick<
 export interface ResponseErrorHTTPSApi extends FetchCommonPayloadHTTPSApi, Pick<RejectRequestInServer_P, 'msg' | 'errExt'> {}
 export interface RequestPayloadHTTPSApi { keyAction: FetchCommonPayloadHTTPSApi['keyAction']; request: { url: string } & RequestOptions_P }
 
+export interface HTTPSApi_Events{
+  fetch(info: FetchCommonPayloadHTTPSApi & Pick<RejectRequestInServer_P, 'msg'>): void;
+} 
+
+
 
 declare global {
   interface Window{

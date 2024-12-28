@@ -1,2 +1,2 @@
 export * from './WsApi';
-export * from './WsApi.types';
+export type { WsApiE_StatusConnect_OR, WsApi_Options_P, } from './WsApi.types';

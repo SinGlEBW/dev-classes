@@ -1,34 +1,23 @@
-
+import { UtilsProps } from './Utils.types';
+//TODO: Почистить
 
 export class Utils {
-  static events (status: 'add' | 'remove', who, entriesEvents, msg = '') {
-    console.log(`##########--------<{ ${status === 'add' ? 'Создаём' : 'Удаляем'} пачку ивентов ${msg}}>---------#########`);
+  static events:UtilsProps['events'] = (status, who, entriesEvents, msg = '') => {
     return new Promise((resolve, reject) => {
       let total = 0;
       for (let [keyEvent, watchEvent] of entriesEvents) {
         total++;
         if(status === 'add'){
-          who.addEventListener
-          ? who.addEventListener(keyEvent, watchEvent)
-          : who.on 
-            ? who.on(keyEvent, watchEvent)
-            : console.log('Utils.events:>> ', 'Отсутствует метод "addEventListener"');  
+          who.addEventListener(keyEvent, watchEvent)
         }else{
-          who.removeEventListener
-          ? who.removeEventListener(keyEvent, watchEvent)
-          : who.off
-            ? who.off(keyEvent, watchEvent)
-            : console.log('Utils.events:>> ', 'Отсутствует метод "removeEventListener"');  
-      
+          who.removeEventListener(keyEvent, watchEvent)
         }
-      
         (total === entriesEvents.length) && resolve('');
       }
-    
     })
   }
-  static sortDataByAlphabet = (arrData: {[key: string]: any}[], sortKey: string) => {
-    arrData.sort((item1, item2) => (item2[sortKey].trim() < item1[sortKey].trim()) ? 1 : -1)
+  static sortDataByAlphabet:UtilsProps['sortDataByAlphabet'] = (arrData, sortKey) => {
+    return arrData.sort((item1, item2) => (item2[sortKey].trim() < item1[sortKey].trim()) ? 1 : -1)
   }
 
   static sortDataByDate = (data:any[], keyDate: string) => {

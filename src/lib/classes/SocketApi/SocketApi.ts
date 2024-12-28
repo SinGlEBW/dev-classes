@@ -1,77 +1,146 @@
+import { DelaysPromise } from "@classes/DelaysPromise/DelaysPromise";
+import { NetworkInformationCordova, NetworkInformationPC } from "@classes/Utils/NetworkInformation/classes";
 import uuid4 from "uuid4";
-import { ConnectOptions_P, EventNames_OR, GetCbByKeyNameEvent, WsApi } from "./deps/WsApi";
+import { EventSubscribers } from "../Utils/EventSubscribers/EventSubscribers";
+import { NetworkInformation } from "../Utils/NetworkInformation/NetworkInformation";
+import type { SocketApi_Options_P, SocketApi_State_P } from "./SocketApi.types";
+import { WsApi, WsApi_Options_P } from "./deps/WsApi";
+/*
+  TODO: Передавать опции
+  SocketApi.init({
+    isReconnect: true//Если появиться интернет
+  })
+*/
 
-interface WatchI {
-  watchTimeOffReConnect(info: { status: boolean; msg: string }): void;
-  watchReConnect(status: boolean): void;
+interface SocketApi_Events {
+  timeOffReConnect(info: { status: boolean; msg: string }): void;
+  reConnect(status: boolean): void;
 }
-
-class Watch implements WatchI {
-  watchTimeOffReConnect(info: { status: boolean; msg: string }): void {}
-  watchReConnect(status: boolean): void {}
-}
-
-// class EventEmitter{
-//   registerEvents = {}
-
-//   on(name, cb){
-//       if(!this.registerEvents[name]) this.registerEvents[name] = [];
-//       this.registerEvents[name].push(cb)
-//   }
-//   once(name, cb){
-//     if(!this.registerEvents[name]) this.registerEvents[name] = [];
-//     this.registerEvents[name].push(cb)
-// }
-//   emit(name, data?: any){
-//       const cbs = this.registerEvents[name]
-//       if(cbs){
-//           cbs.forEach(cb => cb(data))
-//       }
-//   }
-// }
-
 
 export class SocketApi {
-  private static wsApi = new WsApi();
-  private static watch = new Watch();
-
-  static state = {
+  private static state: SocketApi_State_P = {
     isDisconnect: true,
-    initConnect: false,
-    isReConnect: false,
+    isActiveReConnect: false,
+    isOfflineSocket: true,
+    isReady: false,
+    isNetworkStatus: navigator.onLine,
   };
-  private static saveID: Partial<Record<"idConnect" | "checkConnect", number | null>> = {
-    idConnect: null,
+  private static options: SocketApi_Options_P = {
+    isReConnectNetworkOnline: false,
+  };
+  private static wsApi = new WsApi();
+  private static delay = new DelaysPromise();
+  private static internet = new NetworkInformation([new NetworkInformationPC(), new NetworkInformationCordova()]);
+  private static events = new EventSubscribers<SocketApi_Events>(["timeOffReConnect", "reConnect"]);
+  private static saveID: Partial<Record<"idReConnect" | "checkConnect", number | null>> = {
+    idReConnect: null,
     checkConnect: null,
   };
   private static stateDefault = SocketApi.copyState(SocketApi.state);
 
-  static on<K extends EventNames_OR>(eventName: K, cb: GetCbByKeyNameEvent<K>) {
-    return SocketApi.wsApi.on(eventName, cb);
+  private static copyState(state) {
+    return JSON.parse(JSON.stringify(state));
   }
-  static off<K extends EventNames_OR>(eventName: K, cb: GetCbByKeyNameEvent<K>) {
-    SocketApi.wsApi.off(eventName, cb);
+  private static setState(state: Partial<typeof SocketApi.state>) {
+    SocketApi.state = { ...SocketApi.state, ...state };
   }
-  static setOptions = (option: ConnectOptions_P = SocketApi.wsApi.configWs) => {
-    if (!SocketApi.state.initConnect) {
-      SocketApi.state.initConnect = true;
-      SocketApi.wsApi.configWs = { ...SocketApi.wsApi.configWs, ...option };
-      SocketApi.wsApi.internet.addWatcherInternet();
+  private static resetState() {
+    SocketApi.state = SocketApi.copyState(SocketApi.stateDefault);
+  }
+  private static setOptions(options: Partial<SocketApi_Options_P>) {
+    SocketApi.options = { ...SocketApi.options, ...options };
+  }
+
+  private static setStatusReConnect(status: boolean) {
+    SocketApi.setState({ isActiveReConnect: status });
+    SocketApi.events.publish("reConnect", status);
+  }
+  private static setInfoConnect = (info) => {
+    if (!info.status) {
+      SocketApi.close();
+    }
+    SocketApi.setState({ isOfflineSocket: !info.status });
+    SocketApi.events.publish("timeOffReConnect", info);
+    SocketApi.setStatusReConnect(false);
+  };
+  private static online = () => {
+    SocketApi.setState({ isNetworkStatus: true });
+    if (!SocketApi.state.isActiveReConnect && SocketApi.options.isReConnectNetworkOnline) {
+      SocketApi.socketReConnect();
     }
   };
-  static close() {
-    SocketApi.resetSocket();
-    SocketApi.wsApi.setStatus("close");
+  private static offline = () => {
+    //SocketApi.config.isReConnect
+    SocketApi.setState({ isNetworkStatus: false });
+    if (SocketApi.state.isActiveReConnect) {
+      SocketApi.stopReConnect(false);
+    }
+  };
+
+  private static splitOptions = (options: WsApi_Options_P & SocketApi_Options_P) => {
+    return Object.entries(options).reduce(
+      (acc, [key, value]) => {
+        const currentWsOptions = SocketApi.wsApi.getOptions();
+        if (key in currentWsOptions) {
+          return { ...acc, WsOptions: { ...acc.WsOptions, [key]: value } };
+        }
+        return { ...acc, SocketApiOptions: { ...acc.SocketApiOptions, [key]: value } };
+      },
+      { WsOptions: {}, SocketApiOptions: {} } as { WsOptions: WsApi_Options_P; SocketApiOptions: SocketApi_Options_P }
+    );
+  };
+  /*---------------------------------------------------------------------------------------------------------------------------*/
+  static getState = () => SocketApi.state;
+  static on: typeof SocketApi.wsApi.on & typeof SocketApi.events.subscribe = (name, listener) => {
+    const wsApi_RegisteredEvents = SocketApi.wsApi.getRegisteredEvents();
+    if (!wsApi_RegisteredEvents.includes(name)) {
+      SocketApi.events.subscribe(name, listener);
+    } else {
+      SocketApi.wsApi.on(name, listener);
+    }
+  };
+  static off: typeof SocketApi.wsApi.on & typeof SocketApi.events.subscribe = (name, listener) => {
+    const wsApi_RegisteredEvents = SocketApi.wsApi.getRegisteredEvents();
+    if (!wsApi_RegisteredEvents.includes(name)) {
+      SocketApi.events.unsubscribe(name, listener);
+    } else {
+      SocketApi.wsApi.off(name, listener);
+    }
+  };
+  // static getRequestSave = SocketApi.wsApi.getRequestSave;
+  static getStatusSocket = SocketApi.wsApi.getStatusSocket;
+  static close = () => {
+    if (SocketApi.state.isActiveReConnect) {
+      SocketApi.stopReConnect(false);
+    } else {
+      SocketApi.wsApi.close();
+    }
+  };
+
+  static init = (options: WsApi_Options_P & SocketApi_Options_P) => {
+    const { WsOptions, SocketApiOptions } = SocketApi.splitOptions(options);
+
+    SocketApi.internet.run((status) => {
+      status ? SocketApi.online() : SocketApi.offline();
+    });
+    SocketApi.setOptions(SocketApiOptions);
+    SocketApi.wsApi.init(WsOptions);
+  };
+
+  static connect() {
+    if (SocketApi.wsApi.getIsInitWS()) {
+      console.log("CONNECT WS");
+      SocketApi.setState({ isDisconnect: false });
+      SocketApi.wsApi.connect();
+    }
   }
+
   static disconnect() {
     if (!SocketApi.state.isDisconnect) {
-      SocketApi.state.isDisconnect = true;
+      SocketApi.setState({ isDisconnect: true });
       console.log("DISCONNECT WS");
-      SocketApi.wsApi.internet.removeWatcherInternet();
-      SocketApi.wsApi.setStatus("disconnect");
-      SocketApi.resetSocket();
+      SocketApi.wsApi.disconnect();
       SocketApi.resetState();
-      SocketApi.wsApi.resetState();
     }
   }
 
@@ -84,117 +153,89 @@ export class SocketApi {
       payload: { action, ...payload },
       cb,
     });
-
+    const ws = SocketApi.wsApi.getSocket();
     /*FIXME: Нужно слать id запроса, после ответ искать по id, потому что может быть запрошено несколько */
-    if (!SocketApi.wsApi.state.ws || SocketApi.wsApi.state.ws.readyState !== 1) {
+    if (!ws || ws.readyState !== 1) {
       console.log("Нет подключения к сокету");
       return;
     }
-
-    SocketApi.wsApi.state.ws?.send(JSON.stringify(data));
+    SocketApi.wsApi.send(JSON.stringify(data));
   }
 
-  static connect() {
-    SocketApi.createConnect();
-  }
-  static stopReConnect() {
+  static stopReConnect(status?: boolean) {
     console.dir("функция stop не присвоена к stopReConnect");
   }
-  static resetState() {
-    SocketApi.state = SocketApi.copyState(SocketApi.stateDefault);
-  }
-  static getTimeRequest() {
+
+  static #getTimeRequest() {
     //TODO: придумать как получить время запроса. Нужно ориентироваться на action ответа что бы понимать ответ данного сообщения
   }
 
-  static getRequestSave = SocketApi.wsApi.getRequestSave;
   /*------------------------------------------------------------------------------------------------------*/
-  static watchReConnect(cb: WatchI["watchReConnect"]) {
-    SocketApi.watch.watchReConnect = cb;
-  }
-  static watchTimeOffReConnect(cb: WatchI["watchTimeOffReConnect"]) {
-    SocketApi.watch.watchTimeOffReConnect = cb;
-  }
-  /*------------------------------------------------------------------------------------------------------*/
-  private static copyState(state) {
-    return JSON.parse(JSON.stringify(state));
-  }
-  private static resetSocket() {
-    SocketApi.wsApi.state.ws?.close();
-    SocketApi.wsApi.removeEvents();
-  }
-  private static createConnect() {
-    console.log("CONNECT WS");
-    SocketApi.resetSocket();
-    SocketApi.state.isDisconnect = false;
-    SocketApi.wsApi.state.ws = new WebSocket(SocketApi.wsApi.configWs.url);
-    SocketApi.wsApi.setStatus("pending");
-    SocketApi.wsApi.addEvents();
-  }
+
+  // useEffect(() => {
+  //   if((isReConnectSocket && (!isNetworkStatus || statusWS === 'ready'))){
+  //     SocketApi.stopReConnect();
+  //   }
+  // },[isReConnectSocket, isNetworkStatus, statusWS]);
+
   static socketReConnect = () => {
-    if (!SocketApi.saveID.idConnect) {
-      SocketApi.state.isReConnect = true;
-      SocketApi.watch.watchReConnect(true);
-      SocketApi.createConnect();
-      SocketApi.wsApi
+    if (!SocketApi.wsApi.getIsInitWS()) {
+      return;
+    }
+
+    console.log("reconnect");
+    if (!SocketApi.saveID.idReConnect) {
+      SocketApi.setStatusReConnect(true);
+
+      // SocketApi.connect();
+      const { timeReConnect, numberOfRepit } = SocketApi.wsApi.getOptions();
+      SocketApi.delay
         .startActionEvery(
           () => {
-            if (SocketApi.wsApi.getStatus() === "ready") {
+            console.log("reconnect:>>delay");
+            if (SocketApi.wsApi.getStatusSocket() === "ready") {
               console.dir("Подключение установлено");
               return true;
             }
-            SocketApi.createConnect();
+            // SocketApi.connect();
             return false;
           },
           {
-            interval: SocketApi.wsApi.configWs.timeReConnect,
-            countAction: SocketApi.wsApi.configWs.numberOfRepit,
+            interval: timeReConnect,
+            countAction: numberOfRepit,
             watchIdInterval: (id) => {
-              SocketApi.saveID.idConnect = id;
+              SocketApi.saveID.idReConnect = id;
             },
             controlAction: ({ stop, getIsActiveEvent }) => {
-              console.group("Вызван controlAction");
-              console.log("getIsActiveEvent не используется");
-              console.groupEnd();
-              SocketApi.stopReConnect = () => {
-                stop();
+              SocketApi.stopReConnect = (status?: boolean) => {
+                stop(status);
               };
-
-              // const idInterval = setInterval(() => {
-              //   const isActive = getIsActiveEvent()
-              //   if(!SocketApi.wsApi.internet.isOnline){
-              //     clearInterval(idInterval);
-              //     stop();
-              //     return;
-              //   }
-              //   if (SocketApi.wsApi.state.statusConnect === "ready") {
-              //     clearInterval(idInterval);
-              //     stop();
-              //   }else if(!isActive){
-              //     clearInterval(idInterval);
-              //   }
-
-              // }, SocketApi.intervalCheckConnectSocket);
             },
           }
         )
         .then(SocketApi.setInfoConnect)
         .catch(SocketApi.setInfoConnect);
     } else {
-      console.groupCollapsed("Процесс idConnect уже запущен");
+      console.groupCollapsed("Процесс socketReConnect уже запущен");
       console.log("SocketApi.saveID: ", SocketApi.saveID);
       console.groupEnd();
     }
   };
-
-  private static setInfoConnect = (info) => {
-    if (!info.status) {
-      SocketApi.close();
-    }
-    SocketApi.watch.watchTimeOffReConnect(info);
-    SocketApi.watch.watchReConnect(false);
-    SocketApi.state.isReConnect = false;
-  };
-
-  static getStatus = () => SocketApi.wsApi.getStatus();
 }
+
+
+// const idInterval = setInterval(() => {
+//   const isActive = getIsActiveEvent()
+//   if(!SocketApi.wsApi.internet.isOnline){
+//     clearInterval(idInterval);
+//     stop();
+//     return;
+//   }
+//   if (SocketApi.wsApi.state.statusConnect === "ready") {
+//     clearInterval(idInterval);
+//     stop();
+//   }else if(!isActive){
+//     clearInterval(idInterval);
+//   }
+
+// }, SocketApi.intervalCheckConnectSocket);

@@ -1,17 +1,55 @@
+import { NetworkInformation } from '@classes/Utils/NetworkInformation/NetworkInformation';
 import { apiRequest, RejectRequestInServer_P, type ResolveRequestInServer_P } from './deps/apiRequest/apiRequest';
-import type { FetchCommonPayloadHTTPSApi, RequestPayloadHTTPSApi, ResponseErrorHTTPSApi } from './HTTPSApi.types';
-export * from './HTTPSApi.types';
+import type { FetchCommonPayloadHTTPSApi, HTTPSApi_Events, RequestPayloadHTTPSApi, ResponseErrorHTTPSApi } from './HTTPSApi.types';
+import { NetworkInformationCordova, NetworkInformationPC } from '@classes/Utils/NetworkInformation/classes';
+import { EventSubscribers } from '@classes/Utils/EventSubscribers/EventSubscribers';
 
 
 export class HTTPSApi{
-  private static options = {
-    getIsNetwork: () => true,
-    setStatusFetch: (req) => {req.keyAction == ''},
+  private static state = {
+    isInit: false,
+    isNetworkStatus: navigator.onLine,
+  };
+
+  private static internet = new NetworkInformation([new NetworkInformationPC(), new NetworkInformationCordova()]);
+  private static events = new EventSubscribers<HTTPSApi_Events>(["fetch"]);
+
+  private static setState(state: Partial<typeof HTTPSApi.state>) {
+    HTTPSApi.state = { ...HTTPSApi.state, ...state };
+  }
+  private static getState() {
+    return HTTPSApi.state
+  }
+  private static getIsNetwork() {
+    return HTTPSApi.state.isNetworkStatus
   }
 
-  static setOptions(options: Partial<typeof HTTPSApi.options>) {
-    HTTPSApi.options = { ...HTTPSApi.options, ...options }
-  }
+  private static online = () => {
+    HTTPSApi.setState({ isNetworkStatus: true });
+  };
+  private static offline = () => {
+    HTTPSApi.setState({ isNetworkStatus: false });
+  };
+  private static errorInit = () => {
+    console.error("Не вызван HTTPSApi.init()");
+  };
+  private static getIsInit = () => {
+    const { isInit } = HTTPSApi.getState();
+    if (!isInit) {
+      HTTPSApi.errorInit();
+    }
+    return isInit;
+  };
+
+  static init = () => {
+    HTTPSApi.internet.run((status) => {
+      status ? HTTPSApi.online() : HTTPSApi.offline();
+    });
+    HTTPSApi.setState({ isInit: true });
+  };
+
+  static on = HTTPSApi.events.subscribe;
+  static off = HTTPSApi.events.unsubscribe;
 
   static request<Result, Req extends RequestPayloadHTTPSApi = RequestPayloadHTTPSApi>(
     { keyAction, request }:Req 
@@ -19,8 +57,12 @@ export class HTTPSApi{
     const { url, ...other } = request;
 
     return new Promise((resolve, reject) => {
-      const { getIsNetwork, setStatusFetch } = HTTPSApi.options;
-      const isNetwork = getIsNetwork()
+      const isInit = HTTPSApi.getIsInit();
+      if(!isInit){
+        throw new Error("Не вызван HTTPSApi.init()");
+      }
+
+      const isNetwork = HTTPSApi.getIsNetwork()
   
       const payloadFetch:FetchCommonPayloadHTTPSApi & Pick<RejectRequestInServer_P, 'msg'> = { 
         url,
@@ -32,7 +74,7 @@ export class HTTPSApi{
         isReload: false
       };
       
-      setStatusFetch(payloadFetch)
+      HTTPSApi.events.publish("fetch", payloadFetch);
       if (isNetwork) {
         apiRequest
           .requestInServer<any>(url, other)
@@ -40,21 +82,19 @@ export class HTTPSApi{
             const successPayload:FetchCommonPayloadHTTPSApi & ResolveRequestInServer_P<Result> & Pick<RejectRequestInServer_P, 'msg'> = { 
               isReq: false, isReload: true, isErr: false, keyAction, msg: '', ...response
             }
-            setStatusFetch(successPayload);
+            HTTPSApi.events.publish("fetch", successPayload);
             resolve(successPayload);
           })
           .catch((dataErr: RejectRequestInServer_P) => {
             const errorPayload:ResponseErrorHTTPSApi = { 
               isReq: false, isReload: false, keyAction, ...dataErr, 
             };
-           
-            setStatusFetch(errorPayload);
+            HTTPSApi.events.publish("fetch", errorPayload);
             reject(errorPayload);
           });
         return;
       }
-
-      setStatusFetch(payloadFetch)
+      HTTPSApi.events.publish("fetch", payloadFetch);
       reject(payloadFetch);
     });
   }
@@ -62,4 +102,3 @@ export class HTTPSApi{
     apiRequest.removeAuthCookie();
   }
 }
-

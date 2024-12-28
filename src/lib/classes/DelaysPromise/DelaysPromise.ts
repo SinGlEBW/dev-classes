@@ -1,25 +1,18 @@
-interface  StartActionEveryConfigI {
-  interval: number,
-  cutoffTime?: number;//4000
-  countAction?:number;//example 5
-  watchIdInterval?(id:number | null):void;
-  controlAction?(control:{ stop():void, getIsActiveEvent():boolean }):void
-}
 
-
-export interface DelaysPromiseProps{
-  startActionEvery: (cb: () => boolean, config: StartActionEveryConfigI) => Promise<{status: boolean, msg: string}>
-}
+import { DelaysPromiseProps, ControlAction } from "./DelaysPromise.types";
 
 export class DelaysPromise{
+  private defaultProps = {
+    interval: 5000
+  }
 
-  startActionEvery:DelaysPromiseProps['startActionEvery'] = (cb, config = { interval: 5000 }) => {
+  startActionEvery:DelaysPromiseProps['startActionEvery'] = (cb, config = this.defaultProps) => {
     const setId = (id) => {
-      typeof config?.watchIdInterval === "function" &&  config?.watchIdInterval(id);
-    };
+      config?.watchIdInterval && config?.watchIdInterval(id);
+    }
 
-    const controlAction = (control) => {
-      typeof config?.controlAction === "function" && config?.controlAction(control)
+    const controlAction = (control: ControlAction) => {
+      config?.controlAction && config?.controlAction(control)
     };
  
     return new Promise((resolve, reject) => {
@@ -29,7 +22,6 @@ export class DelaysPromise{
 
               rejectCutoff - в случае заданного interval мы ждём когда вернёт cb true, этот параметр задаёт отсечку по времени
                              спустя которое cb перестанет вызываться даже если true не будет. Отработает в таком случае reject
-                             
       */
 
       let countInterval = 0;
@@ -50,8 +42,8 @@ export class DelaysPromise{
             return;
           }
 
-          const stop = cb();
-          if (stop) {
+          const isStop = cb();
+          if (isStop) {
             options.isActive = false;
             clearInterval(idInterval);
             setId(null);
@@ -63,18 +55,20 @@ export class DelaysPromise{
       setId(idInterval);
       controlAction({
         getIsActiveEvent: () => options.isActive,
-        stop: () => {
-          const msg =  "Ручное завершение startActionEvery"
+        stop: (status) => {
+          const msg = "Ручное завершение startActionEvery" 
           options.isActive = false;
           clearInterval(idInterval);
           setId(null);
-          resolve({ status: true, msg });
+          status === false 
+          ? reject({ status: false, msg: msg + ': (false)' }) 
+          : resolve({ status: true, msg: msg + ': (true)' });
         }
       })
     });
   }
   
-  oneOf = (promiseWatch, potentialCaseCB, {second}) => {
+  oneOf:DelaysPromiseProps['oneOf'] = (promiseWatch, potentialCaseCB, {second}) => {
     /*
       INFO: 
       promiseWatch - промис который должен сработать в течении (second) времени.
@@ -93,17 +87,14 @@ export class DelaysPromise{
     
   }  
 
-  oneOfPromise = (promiseWatch, cbPotentialReject, {second}) => 
+  oneOfPromise:DelaysPromiseProps['oneOfPromise'] = (promiseWatch, cbPotentialReject, {second}) => 
     new Promise((resolve, reject) => {
-
-     
       /*
         INFO: 
         promiseWatch - промис который должен сработать в течении (second) времени.
         potentialCaseCB - cb который вызывается спустя время (second) при условии если промис promiseWatch не отработал
                           potentialCaseCB должна вернуть объект который будет передан в reject
       */
-
       let isResponce = 1;
       let errPayload = {status: false, msg: '',}
       promiseWatch()
@@ -125,7 +116,7 @@ export class DelaysPromise{
         if(isResponce === 1){ 
           isResponce = 0;
           if(typeof cbPotentialReject === 'function'){
-            reject({status: false, msg: '', ...cbPotentialReject(errPayload)})
+            reject({status: false, msg: '', ...cbPotentialReject(errPayload) as any})
             return;
           }
           reject({status: false, msg: 'oneOfPromise reject'});

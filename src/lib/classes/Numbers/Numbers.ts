@@ -1,19 +1,18 @@
+import { NumbersProps } from './Numbers.types';
+
 export class Numbers {
-  static getOnlyTheStringNumbers(dirtyString){
+  static getOnlyTheStringNumbers:NumbersProps['getOnlyTheStringNumbers'] = (dirtyString)=>{
     return dirtyString.split('').filter((itemStr) => !Number.isNaN(Number.parseInt((itemStr)))).join('')
   }
-  static isNumber(charStr){
-    try {
-      if(charStr.length > 1){
-        throw new Error('Передали < 1 значения')
-      }
-      return !Number.isNaN(Number.parseInt((charStr)))
-      
-    } catch (error) {
-      console.error(error)
+  static isNumber:NumbersProps['isNumber'] = (charStr) => {
+    switch (typeof charStr) {
+      case 'string':
+        return [...charStr].every((item) => !Number.isNaN(Number(item)));
+      case 'number': return true;
+      default: return false; 
     }
   }
-  static randomNumber = () => {
+  static randomNumber:NumbersProps['randomNumber'] = () => {
     const date = new Date();
     return Math.floor(Math.random() * date.getTime())
   }

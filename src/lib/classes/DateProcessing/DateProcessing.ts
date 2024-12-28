@@ -1,43 +1,8 @@
-
-const itemsMonths = ["Январь", "Февраль","Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"] as const;
-const itemsWeek = ['Вс','Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'] as const;
-
-
-export interface DateProcessingI{
-  getActiveColorClassInDiffDate(a:string, b:string, c:string):string
-  getClassByDifferenceDay(a:string, b:{className:string, diffDay:number}[]):string
-  getMinMaxDate(a:string, b:string, c:string):Record<'minDate' | 'maxDate' | 'minMaxMonth', string >
-  splitDateFromTime(a:string):string[]
-  getCorrectDateAndTime(a:string):[string, string]
-  reverseDate(a:string):string
-  correctionDataISO8601(a:string):string
-  isDateDMY(a:string):boolean
-  correctionDateAndRemoveYear(a:string, b?:Partial<{isYear:boolean}>):string
-  correctionDateWithOutCurrentYear(a:string, b?:Partial<{shortYear:boolean}>):string
-  correctionShortYear(a:string):string
-  correctionDate(a:string, b?:Partial<Record<'isRemoveYear'| 'shortYear' | 'withOutCurrentYear', boolean>>):string
-  hasDateLessPeriod(a:string, b: string, c?:{dateMinMax: '<=' | '>=' | '<' | '>'}):boolean
-  hasDateLessPeriods(a:string, b: string, c:string, d?:{dateMinMax: '<=' | '>=' | '<' | '>'}):Record<'one' | 'two', boolean>
-  getDi(a:string, b: string):number
-  getDifferenceDates(a:string, b: string):number
-  hasDateLessInNumber(a:string, b: string, c:number):boolean
-  correctionCurrentYear(a:[string], b?:number):string[]
-  getChunkFromDate(a:string, b:'day' | 'month' | 'year', c?:{isBeforeZero:boolean}):string
-  getNameMonthByNumber(a:number):(typeof itemsMonths)[number]
-  minMaxMountStr(a:Record<'minDate' | 'maxDate', string>): {minMaxMonth: string}
-  getDatesToCurrentDate(a:string[]):string[]
-  getDayOfWeek(a:string):(typeof itemsWeek)[number] | null
-  cropSecond(a:string):string
-  getRenderDate(a:string, b?:{withOutCurrentYear: boolean} ):'Сегодня' | 'Вчера' | 'Позавчера' | string 
-  getCurrentDate():string 
-  getDaysInMonth(a: number, b: number):number 
-  getCurrentYear():number 
-}
-
+import { itemsMonths, itemsWeek, type DateProcessingProps } from './DateProcessing.types';
 
 
 export class DateProcessing {
-  static getActiveColorClassInDiffDate:DateProcessingI['getActiveColorClassInDiffDate'] = (date1, date2, activeClass) => {
+  static getActiveColorClassInDiffDate:DateProcessingProps['getActiveColorClassInDiffDate'] = (date1, date2, activeClass) => {
     let classColorFactCell = '';
     if(date1 && date2){
       let isLess = DateProcessing.hasDateLessPeriod(date1, date2);
@@ -46,7 +11,7 @@ export class DateProcessing {
     return classColorFactCell
   }   
   
-  static getClassByDifferenceDay:DateProcessingI['getClassByDifferenceDay'] = (date, itemsColors) => {
+  static getClassByDifferenceDay:DateProcessingProps['getClassByDifferenceDay'] = (date, itemsColors) => {
     let className = '';
     let sortColorsConfig = itemsColors.sort((a, b) => (a.diffDay - b.diffDay));
     for(let i = 0; i < sortColorsConfig.length; i++){
@@ -61,7 +26,7 @@ export class DateProcessing {
     return className;
   }
 
-  static getMinMaxDate:DateProcessingI['getMinMaxDate'] = (date, minDate, maxDate) => {
+  static getMinMaxDate:DateProcessingProps['getMinMaxDate'] = (date, minDate, maxDate) => {
     let ob = { minDate: '', maxDate: '', minMaxMonth: ''};
   
     if(/^\d{2}\.\d{2}\.\d{4}$/.test(date) || /^\d{2}\.\d{2}$/.test(date)){
@@ -87,9 +52,9 @@ export class DateProcessing {
     // throw new Error('функция getMinMaxDate >> формат дат не соответствует формату: "дд.мм.гггг"')
   }
 
-  static splitDateFromTime:DateProcessingI['splitDateFromTime'] = (dateTime) => dateTime.split(dateTime.includes('T') ? 'T' : ' ')
+  static splitDateFromTime:DateProcessingProps['splitDateFromTime'] = (dateTime) => dateTime.split(dateTime.includes('T') ? 'T' : ' ')
 
-  static getCorrectDateAndTime:DateProcessingI['getCorrectDateAndTime'] = (dateTime) => {
+  static getCorrectDateAndTime:DateProcessingProps['getCorrectDateAndTime'] = (dateTime) => {
     let doubleDot = dateTime.match(/\D/);
     let time, date;
 
@@ -108,9 +73,9 @@ export class DateProcessing {
     }
     return [date, time]
   }
-  static reverseDate:DateProcessingI['reverseDate'] = (date) => date.split('-').reverse().join('-')
+  static reverseDate:DateProcessingProps['reverseDate'] = (date) => date.split('-').reverse().join('-')
 
-  static correctionDataISO8601:DateProcessingI['correctionDataISO8601'] = (date) => {
+  static correctionDataISO8601:DateProcessingProps['correctionDataISO8601'] = (date) => {
     /* INFO: Проверяет корректность даты. Если не "гггг-мм-дд", то переведёт из дд.мм.гггг | дд.мм.гггг чч:мм вариантов*/
     let newDate = '';
     if(DateProcessing.isDateDMY(date)){
@@ -124,10 +89,10 @@ export class DateProcessing {
     return newDate;
   }
 
-  static isDateDMY:DateProcessingI['isDateDMY'] = (date: string) => /^\d{2}\.\d{2}\.\d{4}$/.test(date) || /^\d{2}\.\d{2}\.\d{4}\s\d{2}:\d{2}$/.test(date)
+  static isDateDMY:DateProcessingProps['isDateDMY'] = (date: string) => /^\d{2}\.\d{2}\.\d{4}$/.test(date) || /^\d{2}\.\d{2}\.\d{4}\s\d{2}:\d{2}$/.test(date)
   static isDateISO8601 = (date: string) => /^\d{4}-\d{2}-\d{2}$/.test(date) || /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(date)
 
-  static correctionDateAndRemoveYear:DateProcessingI['correctionDateAndRemoveYear'] = (date, options) => {
+  static correctionDateAndRemoveYear:DateProcessingProps['correctionDateAndRemoveYear'] = (date, options) => {
     //INFO: Переводит число "гггг-мм-дд" в "дд.мм"
     const isYear = !!options?.isYear
 
@@ -140,7 +105,7 @@ export class DateProcessing {
     return arrTime.join('.')
   }
 
-  static correctionDateWithOutCurrentYear:DateProcessingI['correctionDateWithOutCurrentYear'] = (date, options) => {
+  static correctionDateWithOutCurrentYear:DateProcessingProps['correctionDateWithOutCurrentYear'] = (date, options) => {
     const shortYear = !!options?.shortYear;
 
     date = DateProcessing.correctionDataISO8601(date);
@@ -155,13 +120,13 @@ export class DateProcessing {
     )
   }
 
-  static correctionShortYear:DateProcessingI['correctionShortYear'] = (date) => {
+  static correctionShortYear:DateProcessingProps['correctionShortYear'] = (date) => {
     const arrChunkDate = DateProcessing.splitDateFromTime(date)[0].split('-').reverse();
     const arrChunkYear = arrChunkDate.splice(-1);
     return `${arrChunkDate.join('.')}.${arrChunkYear[0].slice(2)}`
   }
 
-  static correctionDate:DateProcessingI['correctionDate']  = (date, options) => {
+  static correctionDate:DateProcessingProps['correctionDate']  = (date, options) => {
     date = DateProcessing.correctionDataISO8601(date)
     if(options?.isRemoveYear){
       return DateProcessing.correctionDateAndRemoveYear(date);
@@ -182,7 +147,7 @@ export class DateProcessing {
     )
   }
 
-  static hasDateLessPeriod:DateProcessingI['hasDateLessPeriod'] = (date, period, option) => {
+  static hasDateLessPeriod:DateProcessingProps['hasDateLessPeriod'] = (date, period, option) => {
     const dateMinMax = option?.dateMinMax ? option?.dateMinMax : '<='; 
     date = DateProcessing.correctionDataISO8601(date);
     period = DateProcessing.correctionDataISO8601(period);
@@ -191,14 +156,14 @@ export class DateProcessing {
     return result
   }
 
-  static hasDateLessPeriods:DateProcessingI['hasDateLessPeriods'] = (date1, date2, period, option) => {
+  static hasDateLessPeriods:DateProcessingProps['hasDateLessPeriods'] = (date1, date2, period, option) => {
     return {
       one: DateProcessing.hasDateLessPeriod(date1, period, option),
       two: DateProcessing.hasDateLessPeriod(date2, period, option),
     }
   } 
   
-  static getDifferenceDates:DateProcessingI['getDifferenceDates'] = (date1: string, date2:string) => {
+  static getDifferenceDates:DateProcessingProps['getDifferenceDates'] = (date1: string, date2:string) => {
     //Разница между date2 и date1 больше или равно переданного числа 
     //"2023-08-31 17:14:48"
     const date1Ob = new Date(DateProcessing.correctionDataISO8601(date1));
@@ -211,12 +176,12 @@ export class DateProcessing {
     return diffInDays; 
   }
 
-  static hasDateLessInNumber:DateProcessingI['hasDateLessInNumber'] = (date1, date2, number) => {
+  static hasDateLessInNumber:DateProcessingProps['hasDateLessInNumber'] = (date1, date2, number) => {
     const diffInDays = DateProcessing.getDifferenceDates(date1, date2,)
     return number <= diffInDays
   }
 
-  static correctionCurrentYear:DateProcessingI['correctionCurrentYear'] = (mmDD, year) => {
+  static correctionCurrentYear:DateProcessingProps['correctionCurrentYear'] = (mmDD, year) => {
     /*  INFO: Передав ['мм-дд'] Если текущая */
     const date = new Date();
     const yearNumber = year ? year : date.getFullYear();
@@ -227,7 +192,7 @@ export class DateProcessing {
     })
   }
 
-  static getChunkFromDate:DateProcessingI['getChunkFromDate'] = (date, chunk, option) => {
+  static getChunkFromDate:DateProcessingProps['getChunkFromDate'] = (date, chunk, option) => {
     date = DateProcessing.correctionDataISO8601(date);
     
     const chunkDate = date.split('-');
@@ -238,11 +203,11 @@ export class DateProcessing {
     }
   }
 
-  static getNameMonthByNumber:DateProcessingI['getNameMonthByNumber'] = (month) => {
+  static getNameMonthByNumber:DateProcessingProps['getNameMonthByNumber'] = (month) => {
     return month > 0 && month < 13 ? itemsMonths[Number(month) - 1] : itemsMonths[0]
   } 
 
-  static minMaxMountStr:DateProcessingI['minMaxMountStr'] = (obMinMaxDate) => {
+  static minMaxMountStr:DateProcessingProps['minMaxMountStr'] = (obMinMaxDate) => {
     return {
       minMaxMonth: DateProcessing.getNameMonthByNumber(
         Number(DateProcessing.getChunkFromDate(obMinMaxDate.minDate, 'month', {isBeforeZero: false}))
@@ -255,16 +220,16 @@ export class DateProcessing {
   }
 
  
-  static getDatesToCurrentDate:DateProcessingI['getDatesToCurrentDate'] = (periods) => periods.filter((period) => DateProcessing.hasDateLessPeriod(period, DateProcessing.getCurrentDate()));
+  static getDatesToCurrentDate:DateProcessingProps['getDatesToCurrentDate'] = (periods) => periods.filter((period) => DateProcessing.hasDateLessPeriod(period, DateProcessing.getCurrentDate()));
  
-  static getDayOfWeek:DateProcessingI['getDayOfWeek'] = (date) => {
+  static getDayOfWeek:DateProcessingProps['getDayOfWeek'] = (date) => {
     let correctDate = DateProcessing.correctionDataISO8601(date)
     const dayOfWeek = new Date(correctDate).getDay();
     return isNaN(dayOfWeek) ? null : itemsWeek[dayOfWeek];
   }
-  static cropSecond:DateProcessingI['cropSecond'] = (time) => time.replace(/:\w+$/, '')
+  static cropSecond:DateProcessingProps['cropSecond'] = (time) => time.replace(/:\w+$/, '')
 
-  static getRenderDate:DateProcessingI['getRenderDate'] = (date, options) => {
+  static getRenderDate:DateProcessingProps['getRenderDate'] = (date, options) => {
     const withOutCurrentYear = !!options?.withOutCurrentYear;
     const currentDate = DateProcessing.getCurrentDate();
     const difference = DateProcessing.getDifferenceDates(date, currentDate);
@@ -278,22 +243,22 @@ export class DateProcessing {
     }
   }
 
-  static getCurrentDate:DateProcessingI['getCurrentDate'] = () => {
+  static getCurrentDate:DateProcessingProps['getCurrentDate'] = () => {
     const date = new Date();
     const currentYear = DateProcessing.getCurrentYear();
     const currentMonthDay = date.toJSON().split('T')[0].slice(5);
     const currentFullDate = `${currentYear}-${currentMonthDay}`;
     return currentFullDate;
   }
-  static getCurrentYear:DateProcessingI['getCurrentYear'] = () => new Date().getFullYear()
-  static getDaysInMonth:DateProcessingI['getDaysInMonth'] = (month: number, year: number) => new Date(year, month, 0).getDate();
+  static getCurrentYear:DateProcessingProps['getCurrentYear'] = () => new Date().getFullYear()
+  static getDaysInMonth:DateProcessingProps['getDaysInMonth'] = (month: number, year: number) => new Date(year, month, 0).getDate();
   /**
    * 
    * @param date example: '2022-01-01'
    * @param config example: {day: 1, month: 1, year: 1}
    * @returns example: '2023-02-02'
    */
-  static getDateDeviation = (date: string, config: Partial<Record<"day" | "month" | "year", number>>) => {
+  static getDateDeviation:DateProcessingProps['getDateDeviation'] = (date: string, config: Partial<Record<"day" | "month" | "year", number>>) => {
     const correctDate = DateProcessing.correctionDataISO8601(date);
     const d = new Date(correctDate);
     const { day, month, year } = config;

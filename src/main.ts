@@ -1,5 +1,3 @@
-import { SocketApi } from '@lib';
+// import { SocketApi, DelaysPromise, Color, HTTPSApi, EventSubscribers  } from '@lib';
 
 
-(window as any).SocketApi = SocketApi;
-// SocketApi.setOptions({})

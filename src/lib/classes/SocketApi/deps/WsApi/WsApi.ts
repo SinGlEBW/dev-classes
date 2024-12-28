@@ -1,149 +1,161 @@
-import { DelaysPromise } from "@classes/Delay/Delay";
-
-import { InternetWatcher } from "../InternetWatcher/InternetWatcher";
-import { ConnectOptions_P, EventNames_OR, StatusConnect_OR, WsApiStateDefaultI, WsApiStateSaveDefaultI, type GetCbByKeyNameEvent } from "./WsApi.types";
+import { EventSubscribers } from "@classes/Utils/EventSubscribers/EventSubscribers";
+import type { WsApi_Events, WsApi_Options_P, WsApi_StateProps, WsApiE_StatusConnect_OR } from "./WsApi.types";
 
 //INFO: Назначать функции стрелочными иначе this не читаем
 
-
-export class WsApi extends DelaysPromise {
-
-  configWs: ConnectOptions_P = {
+export class WsApi {
+  private options: WsApi_Options_P = {
     timeReConnect: 5000,
     numberOfRepit: 5,
-    url: '',
+    url: "",
   };
-  internet = new InternetWatcher();
 
-  state: WsApiStateDefaultI & WsApiStateSaveDefaultI = {
+  private state: WsApi_StateProps = {
     statusConnect: "disconnect",
     ws: null,
     arrSaveReq: [],
-    subscribersEvents: {
-      msg: [],
-      status: [],
-    },
   };
+
+  private initOptions = false;
+  private events = new EventSubscribers<WsApi_Events>(["status", "msg"]);
 
   private stateDefault = this.copyState(this.state);
-
-  getStatus = () => this.state.statusConnect;
-  setStatus = (status: StatusConnect_OR) => {
-    this.sendInformationToTheEvent("status", status);
-    this.state.statusConnect = status;
-  };
-
-  removeEvents = () => {
-    this.state.ws?.removeEventListener("open", this.openHandler);
-    this.state.ws?.removeEventListener("close", this.closeHandler);
-    this.state.ws?.removeEventListener("message", this.msgHandler);
-    this.state.ws?.removeEventListener("error", this.errHandler);
-  };
-
-  addEvents = () => {
-    this.state.ws?.addEventListener("open", this.openHandler);
-    this.state.ws?.addEventListener("close", this.closeHandler);
-    this.state.ws?.addEventListener("message", this.msgHandler);
-    this.state.ws?.addEventListener("error", this.errHandler);
-  };
-
-
-  openHandler = () => {
-    console.log("this >> open");
-    this.setStatus("ready");
-
-    // const requestSave = this.getRequestSave();
-    // if(requestSave.length){
-    //   for (let i = 0; i < requestSave.length; i++) {
-    //     const itemRequestSave = requestSave[i];
-    //     this.state.ws?.send(JSON.stringify(itemRequestSave.payload));
-    //     itemRequestSave?.payload?.action && this.removeRequestItemSave(itemRequestSave?.payload?.action);
-    //   } 
-    // }
-  };
-
-  closeHandler = () => {
-    console.log("this >> close");
-    this.setStatus("close");
-  };
- 
-  on<K extends EventNames_OR>(eventName: K, cb: GetCbByKeyNameEvent<K>) {
-    this.state.subscribersEvents[eventName].push(cb);
-    return () => {
-      this.state.subscribersEvents[eventName] = this.state.subscribersEvents[eventName].filter((s) => s !== cb);
-    };
+  private resetState() {
+    this.state = this.copyState(this.stateDefault);
   }
-  off<K extends EventNames_OR>(eventName: K, cb: GetCbByKeyNameEvent<K>) {
-    this.state.subscribersEvents[eventName] = this.state.subscribersEvents[eventName].filter((s) => s !== cb);
+  private setState(state: Partial<typeof this.state>) {
+    this.state = { ...this.state, ...state };
   }
-
-  msgHandler = (e) => {
- 
-    const data = JSON.parse(e.data ? e.data : "{}");
-
-    
-    try {
-      const { action } = data;
-      action && this.setResponceInReqSave(data);
-
-      this.sendInformationToTheEvent('msg', data);
-    } catch (error) {
-      this.sendInformationToTheEvent('msg', JSON.parse("{}"));
+  private eventListener = (action: "add" | "remove") => {
+    const entriesSocketEvents = [
+      ["open", this.openHandler],
+      ["close", this.closeHandler],
+      ["message", this.msgHandler],
+      ["error", this.errHandler],
+    ] as const;
+    for (let i = 0; i < entriesSocketEvents.length; i++) {
+      const [keyEvent, watchEvent] = entriesSocketEvents[i];
+      if (action === "add") {
+        this.state.ws?.addEventListener(keyEvent, watchEvent);
+      } else {
+        this.state.ws?.removeEventListener(keyEvent, watchEvent);
+      }
     }
   };
 
-  errHandler = (err) => {
-    /*
-      INFO: При переключении интернета не рассчитывая на React нужно запускать таймаут
-    */
-    console.log("this >> err");
+  private openHandler = () => {
+    this.setStatus("ready");
+  };
+
+  private closeHandler = () => {
+    this.setStatus("close");
+  };
+
+  private msgHandler = (e) => {
+    const data = JSON.parse(e.data ? e.data : "{}");
+    try {
+      const { action } = data;
+      action && this.setResponceInReqSave(data);
+      this.events.publish("msg", data);
+    } catch (error) {
+      this.events.publish("msg", JSON.parse("{}"));
+    }
+  };
+
+  private errHandler = (err) => {
     this.setStatus("error");
   };
+
   private copyState(state) {
     return JSON.parse(JSON.stringify(state));
   }
-  resetState() {
-    this.state = this.copyState(this.stateDefault);
+
+  private setResponceInReqSave(responce: { action: string; [key: string]: any }) {
+    const requestSave = this.getRequestSave();
+    const filterArrSaveReq: any[] = [];
+    for (let i = 0; i < requestSave.length; i++) {
+      const itemReq = requestSave[i];
+      if (itemReq.payload.action !== responce.action) {
+        filterArrSaveReq.push(itemReq);
+      } else {
+        itemReq.cb && itemReq.cb(responce);
+      }
+    }
+    this.state.arrSaveReq = filterArrSaveReq;
   }
-  
-  private sendInformationToTheEvent = (nameEvent: keyof typeof this.state.subscribersEvents, data) => {
-    this.state.subscribersEvents[nameEvent]?.forEach((cb) => cb(data));
+
+  private removeRequestItemSave(action: string) {
+    const newTotalRequestSave = this.state.arrSaveReq.filter((item) => item.payload?.action !== action);
+    this.state.arrSaveReq = newTotalRequestSave;
+  }
+
+  private errorInitSocket = () => {
+    console.error("Вы не установили опции");
   };
 
-  setRequestSave(reqInfo: typeof this.state.arrSaveReq[number]) {
+  /*----------------------------------------------------------------------------------------------------------*/
+  getRegisteredEvents = () => this.events.getListNameEvents();
+  send(data) {
+    const messageSend = JSON.stringify(data);
+    this.state.ws?.send(messageSend);
+  }
+
+  getIsInitWS = () => {
+    const status = this.initOptions;
+    if (!status) {
+      this.errorInitSocket();
+    }
+    return status;
+  };
+  getSocket = () => this.state.ws;
+
+  getOptions = () => this.options;
+
+  init = (options: typeof this.options) => {
+    this.initOptions = true;
+    this.options = { ...this.options, ...options };
+  };
+
+  getStatusSocket = () => this.state.statusConnect;
+
+  private setStatus = (status: WsApiE_StatusConnect_OR) => {
+    this.events.publish("status", status);
+    this.setState({ statusConnect: status });
+  };
+
+  on = this.events.subscribe;
+  off = this.events.unsubscribe;
+
+  setRequestSave(reqInfo: (typeof this.state.arrSaveReq)[number]) {
     if ("action" in reqInfo.payload) {
       const findItemInx = this.state.arrSaveReq.findIndex((item) => item.payload.action === reqInfo.payload.action);
       if (~findItemInx) {
         this.state.arrSaveReq[findItemInx] = reqInfo;
-      }else{
+      } else {
         this.state.arrSaveReq.push(reqInfo);
       }
     }
   }
 
-  removeRequestItemSave(action: string) {
-    const newTotalRequestSave = this.state.arrSaveReq.filter((item) => item.payload?.action !== action);
-    this.state.arrSaveReq = newTotalRequestSave
+  getRequestSave = () => this.state.arrSaveReq;
+  connect() {
+    if (this.initOptions) {
+      this.close();
+      this.setState({
+        ws: new WebSocket(this.options.url),
+      });
+      this.setStatus("pending");
+      this.eventListener("add");
+    }
   }
-  getRequestSave() {
-    return this.state.arrSaveReq
-  }
-  setResponceInReqSave(responce: {action: string, [key: string]: any}) {
-    
-    const requestSave = this.getRequestSave();
-      const filterArrSaveReq: any[] = [];
-      for (let i = 0; i < requestSave.length; i++) {
-        const itemReq = requestSave[i];
-        if (itemReq.payload.action !== responce.action) {
-          filterArrSaveReq.push(itemReq);
-        } else {
-          itemReq.cb && itemReq.cb(responce);
-        }
-      }
 
-      this.state.arrSaveReq = filterArrSaveReq;
-      console.log('filterArrSaveReq', filterArrSaveReq)
+  close() {
+    this.state.ws?.close();
+    this.eventListener("remove");
+  }
+
+  disconnect() {
+    this.close();
+    this.resetState();
   }
 }
-
-
