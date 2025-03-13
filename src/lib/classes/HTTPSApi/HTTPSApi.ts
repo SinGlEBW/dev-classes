@@ -1,8 +1,8 @@
+import { EventSubscribers } from '@classes/Utils/EventSubscribers/EventSubscribers';
+import { NetworkInformationCordova, NetworkInformationPC } from '@classes/Utils/NetworkInformation/classes';
 import { NetworkInformation } from '@classes/Utils/NetworkInformation/NetworkInformation';
 import { apiRequest, RejectRequestInServer_P, type ResolveRequestInServer_P } from './deps/apiRequest/apiRequest';
 import type { FetchCommonPayloadHTTPSApi, HTTPSApi_Events, RequestPayloadHTTPSApi, ResponseErrorHTTPSApi } from './HTTPSApi.types';
-import { NetworkInformationCordova, NetworkInformationPC } from '@classes/Utils/NetworkInformation/classes';
-import { EventSubscribers } from '@classes/Utils/EventSubscribers/EventSubscribers';
 
 
 export class HTTPSApi{
@@ -82,6 +82,7 @@ export class HTTPSApi{
             const successPayload:FetchCommonPayloadHTTPSApi & ResolveRequestInServer_P<Result> & Pick<RejectRequestInServer_P, 'msg'> = { 
               isReq: false, isReload: true, isErr: false, keyAction, msg: '', ...response
             }
+        //FIXME: Добавить тип data
             HTTPSApi.events.publish("fetch", successPayload);
             resolve(successPayload);
           })
