@@ -9,9 +9,15 @@ export interface FetchCommonPayloadHTTPSApi extends FetchCommonApiRequest, Pick<
 
 export interface ResponseErrorHTTPSApi extends FetchCommonPayloadHTTPSApi, Pick<RejectRequestInServer_P, 'msg' | 'errExt'> {}
 export interface RequestPayloadHTTPSApi { keyAction: FetchCommonPayloadHTTPSApi['keyAction']; request: { url: string } & RequestOptions_P }
+// export type RequestMetaHTTPSApi = FetchCommonPayloadHTTPSApi & Partial<ResolveRequestInServer_P<any>> & Pick<RejectRequestInServer_P, 'msg'>
+
+export type FetchInfo<Result = any> = FetchCommonPayloadHTTPSApi & Pick<RejectRequestInServer_P, 'msg'>  
+| FetchCommonPayloadHTTPSApi & Pick<RejectRequestInServer_P, 'msg'> & ResolveRequestInServer_P<Result> 
+| ResponseErrorHTTPSApi;
+
 
 export interface HTTPSApi_Events{
-  fetch(info: FetchCommonPayloadHTTPSApi & Partial<ResolveRequestInServer_P<any>> & Pick<RejectRequestInServer_P, 'msg'>): void;
+  fetch(info: FetchInfo): void;
 } 
 
 

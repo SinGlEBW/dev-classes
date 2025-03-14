@@ -1,8 +1,8 @@
-import { EventSubscribers } from '@classes/Utils/EventSubscribers/EventSubscribers';
-import { NetworkInformationCordova, NetworkInformationPC } from '@classes/Utils/NetworkInformation/classes';
 import { NetworkInformation } from '@classes/Utils/NetworkInformation/NetworkInformation';
 import { apiRequest, RejectRequestInServer_P, type ResolveRequestInServer_P } from './deps/apiRequest/apiRequest';
-import type { FetchCommonPayloadHTTPSApi, HTTPSApi_Events, RequestPayloadHTTPSApi, ResponseErrorHTTPSApi } from './HTTPSApi.types';
+import type { FetchInfo, HTTPSApi_Events, RequestPayloadHTTPSApi, ResponseErrorHTTPSApi } from './HTTPSApi.types';
+import { NetworkInformationCordova, NetworkInformationPC } from '@classes/Utils/NetworkInformation/classes';
+import { EventSubscribers } from '@classes/Utils/EventSubscribers/EventSubscribers';
 
 
 export class HTTPSApi{
@@ -53,7 +53,7 @@ export class HTTPSApi{
 
   static request<Result, Req extends RequestPayloadHTTPSApi = RequestPayloadHTTPSApi>(
     { keyAction, request }:Req 
-  ):Promise<FetchCommonPayloadHTTPSApi & ResolveRequestInServer_P<Result>> {
+  ):Promise<FetchInfo<Result>> {
     const { url, ...other } = request;
 
     return new Promise((resolve, reject) => {
@@ -64,7 +64,7 @@ export class HTTPSApi{
 
       const isNetwork = HTTPSApi.getIsNetwork()
   
-      const payloadFetch:FetchCommonPayloadHTTPSApi & Pick<RejectRequestInServer_P, 'msg'> = { 
+      const payloadFetch:FetchInfo = { 
         url,
         keyAction,
         isErr: !isNetwork,
@@ -79,10 +79,9 @@ export class HTTPSApi{
         apiRequest
           .requestInServer<any>(url, other)
           .then((response) => {//data, res, statusCode, url
-            const successPayload:FetchCommonPayloadHTTPSApi & ResolveRequestInServer_P<Result> & Pick<RejectRequestInServer_P, 'msg'> = { 
+            const successPayload:FetchInfo = { 
               isReq: false, isReload: true, isErr: false, keyAction, msg: '', ...response
             }
-        //FIXME: Добавить тип data
             HTTPSApi.events.publish("fetch", successPayload);
             resolve(successPayload);
           })
