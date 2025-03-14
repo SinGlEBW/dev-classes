@@ -1,1 +1,0 @@
-export type { RequestPayloadHTTPSApi, ResponseErrorHTTPSApi, FetchInfoHTTPSApi } from './HTTPSApi.types';
