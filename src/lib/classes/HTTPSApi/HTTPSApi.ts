@@ -1,6 +1,6 @@
 import { NetworkInformation } from '@classes/Utils/NetworkInformation/NetworkInformation';
 import { apiRequest, RejectRequestInServer_P, type ResolveRequestInServer_P } from './deps/apiRequest/apiRequest';
-import type { FetchInfo, HTTPSApi_Events, RequestPayloadHTTPSApi, ResponseErrorHTTPSApi } from './HTTPSApi.types';
+import type { FetchCommonPayloadHTTPSApi, FetchInfoHTTPSApi, HTTPSApi_Events, RequestPayloadHTTPSApi, ResponseErrorHTTPSApi } from './HTTPSApi.types';
 import { NetworkInformationCordova, NetworkInformationPC } from '@classes/Utils/NetworkInformation/classes';
 import { EventSubscribers } from '@classes/Utils/EventSubscribers/EventSubscribers';
 
@@ -53,7 +53,7 @@ export class HTTPSApi{
 
   static request<Result, Req extends RequestPayloadHTTPSApi = RequestPayloadHTTPSApi>(
     { keyAction, request }:Req 
-  ):Promise<FetchInfo<Result>> {
+  ):Promise<FetchInfoHTTPSApi<Result>> {
     const { url, ...other } = request;
 
     return new Promise((resolve, reject) => {
@@ -64,24 +64,27 @@ export class HTTPSApi{
 
       const isNetwork = HTTPSApi.getIsNetwork()
   
-      const payloadFetch:FetchInfo = { 
+      const payloadFetch:FetchInfoHTTPSApi<Result> = { 
         url,
         keyAction,
         isErr: !isNetwork,
         msg: isNetwork ? "" : "Нет интернета",
         isReq: isNetwork,
         statusCode: !isNetwork ? 520 : 0,
-        isReload: false
+        isReload: false,
       };
+      
+   
       
       HTTPSApi.events.publish("fetch", payloadFetch);
       if (isNetwork) {
         apiRequest
-          .requestInServer<any>(url, other)
+          .requestInServer<Result>(url, other)
           .then((response) => {//data, res, statusCode, url
-            const successPayload:FetchInfo = { 
+            const successPayload:FetchInfoHTTPSApi<Result> = { 
               isReq: false, isReload: true, isErr: false, keyAction, msg: '', ...response
             }
+      
             HTTPSApi.events.publish("fetch", successPayload);
             resolve(successPayload);
           })
