@@ -16,13 +16,7 @@ export default defineConfig({
   plugins: [
     // libInjectCss(),
     // dts({ include: ['lib/**/!(*.spec|*.test).{ts,tsx}'] }),
-    dts({ 
-      include: entryPathLib,
-      insertTypesEntry: false,
-      rollupTypes: false, //  отключает создание единого файла декларации в корне (.d.ts) 
-      copyDtsFiles: true , //Включает копирование сгенерированных файлов .d.ts в директорию вывода (dist)
-     
-    })
+    dts({ include: entryPathLib })
   ],
   resolve: {
     alias: {
@@ -38,19 +32,14 @@ export default defineConfig({
   build: {
     copyPublicDir: false,
     lib: {
-      entry: {
-        index: resolve(__dirname, entryPathLib + '/index.ts'),
-        // HTTPSApi: resolve(__dirname, entryPathLib + '/classes/HTTPSApi/index.ts')
-      },
+      entry: resolve(__dirname, entryPathLib),
       formats: ['es'],
       name: nameComponent,
   
     },
-    // sourcemap: true,
     rollupOptions: {
       //В пакет не входит external. Пользователь сам это ставит
       // external: ['react', 'react/jsx-runtime', 'react-dom','react-router-dom', 'styled-components'],//, '@emotion/react', '@emotion/styled', '@mui/material'
-     
       input: Object.fromEntries(
           glob.sync(entryPathLib + '/**/*.{ts,tsx}').map(file => [
             relative(
@@ -60,13 +49,10 @@ export default defineConfig({
             fileURLToPath(new URL(file, import.meta.url))
           ])
         ),
-      external:[],
       output: {
         // inlineDynamicImports: false,
         // assetFileNames: 'assets/[name][extname]',
-        entryFileNames: (a) => {
-          return '[name].[format].js'
-        },
+        entryFileNames: '[name].js',
         // globals: {
         //   react: 'React',
         //   'react-dom': 'ReactDOM',
