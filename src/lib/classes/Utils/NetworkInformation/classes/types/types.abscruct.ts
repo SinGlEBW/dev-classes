@@ -1,6 +1,6 @@
 export type SystemType = 'pc' | 'cordova';
 
-export type WatcherCB = (status: boolean) => void
+export type WatcherCB = (status: boolean, textStatus: string) => void
 
 export abstract class NetworkInformationAbstract {
   protected abstract watchers (cb: WatcherCB) : void;

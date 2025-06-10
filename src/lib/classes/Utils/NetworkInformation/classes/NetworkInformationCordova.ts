@@ -5,7 +5,7 @@ export class NetworkInformationCordova extends NetworkInformationAbstract{
   protected watchers = (cb: WatcherCB) => {
     const cbError = (err) => { console.error(err); }
     const watcher = (status: CordovaNetworkStatus) => {
-      cb(!(status === "unknown" || status === "none"))
+      cb(!(status === "unknown" || status === "none"), status)
     }
     (navigator as any)?.connection.getInfo(watcher, cbError)
   }

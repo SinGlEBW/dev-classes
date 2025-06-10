@@ -132,6 +132,7 @@ interface OneOfPromiseReject{
   msg: string;
 }
 
+
 interface DelaysPromiseProps{
   startActionEvery: (cb: () => boolean, config: StartActionEveryConfigI) => Promise<{status: boolean, msg: string}>
   oneOf: (watchPromise: () => Promise<any>, potentialCaseCB: () => void, config: {second: number}) => void
@@ -150,18 +151,7 @@ interface NumbersProps {
 }
 
 ```
-<h3 align="center">Number</h3>
-
-```ts
-
-interface NumbersProps {
-  randomNumber: () => number;
-  getOnlyTheStringNumbers(dirtyString: string): string;
-  isNumber(charStr: string | number): boolean;
-}
-
-```
-<h3 align="center">Number</h3>
+<h3 align="center">File</h3>
 
 ```ts
 

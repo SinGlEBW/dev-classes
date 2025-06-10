@@ -1,3 +1,5 @@
+import type { WatcherCB } from './types/types.abscruct';
+
 const defaultState = {
   isNetworkStatus: window.navigator.onLine,
   listCloseSignals: [] as AbortController[],
@@ -8,18 +10,18 @@ const defaultState = {
 export class InternetWatchers {
   private state = defaultState;
   private resetState = () => this.state = defaultState;
-  addWatchers(cb: (status: boolean) => void){
+  addWatchers(cb: WatcherCB){
     if(!this.state.isWatcher){
       this.state.isWatcher = true;
       const list = [
-        {event: 'online', status: true},
-        {event: 'offline', status: false}
+        {event: 'online', status: true, textStatus: 'network'},
+        {event: 'offline', status: false, textStatus: 'none' }
       ];
       for (let i = 0; i < list.length; i++) {
         const controller = new AbortController();
-        const { event, status } = list[i];
+        const { event, status, textStatus } = list[i];
         this.state.listCloseSignals.push(controller);
-        window.addEventListener(event, () => cb(status), { signal: controller.signal });
+        window.addEventListener(event, () => cb(status, textStatus), { signal: controller.signal });
       }
     }
   }

@@ -67,7 +67,7 @@ export class apiRequest {
           (res) => {
             apiRequest.registerFailedRequests.removeItem(url);
             apiRequest.registerRequest.removeItem(url);
-
+            //INFO: На будуще в set-cookie может не быть token
             const token = res?.headers && res.headers["set-cookie"];
             const statusCode: number = res.status;
             const data = res?.data;

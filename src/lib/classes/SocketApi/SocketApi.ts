@@ -11,6 +11,7 @@ import { WsApi, WsApi_Options_P } from "./deps/WsApi";
     isReconnect: true//Если появиться интернет
   })
 */
+//Последняя версия
 
 interface SocketApi_Events {
   timeOffReConnect(info: { status: boolean; msg: string }): void;
@@ -119,7 +120,6 @@ export class SocketApi {
 
   static init = (options: WsApi_Options_P & SocketApi_Options_P) => {
     const { WsOptions, SocketApiOptions } = SocketApi.splitOptions(options);
-
     SocketApi.internet.run((status) => {
       status ? SocketApi.online() : SocketApi.offline();
     });
@@ -187,7 +187,7 @@ export class SocketApi {
     if (!SocketApi.saveID.idReConnect) {
       SocketApi.setStatusReConnect(true);
 
-      // SocketApi.connect();
+      SocketApi.connect();
       const { timeReConnect, numberOfRepit } = SocketApi.wsApi.getOptions();
       SocketApi.delay
         .startActionEvery(
@@ -197,7 +197,7 @@ export class SocketApi {
               console.dir("Подключение установлено");
               return true;
             }
-            // SocketApi.connect();
+            SocketApi.connect();
             return false;
           },
           {
@@ -207,9 +207,7 @@ export class SocketApi {
               SocketApi.saveID.idReConnect = id;
             },
             controlAction: ({ stop, getIsActiveEvent }) => {
-              SocketApi.stopReConnect = (status?: boolean) => {
-                stop(status);
-              };
+              SocketApi.stopReConnect = stop;
             },
           }
         )

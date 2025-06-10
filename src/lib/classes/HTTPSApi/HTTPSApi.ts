@@ -42,6 +42,7 @@ export class HTTPSApi{
   };
 
   static init = () => {
+    
     HTTPSApi.internet.run((status) => {
       status ? HTTPSApi.online() : HTTPSApi.offline();
     });
@@ -59,7 +60,8 @@ export class HTTPSApi{
     return new Promise((resolve, reject) => {
       const isInit = HTTPSApi.getIsInit();
       if(!isInit){
-        throw new Error("Не вызван HTTPSApi.init()");
+        HTTPSApi.init();
+        // throw new Error("Не вызван HTTPSApi.init()");
       }
 
       const isNetwork = HTTPSApi.getIsNetwork()

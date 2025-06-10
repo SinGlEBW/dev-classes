@@ -20,7 +20,7 @@ export class DelaysPromise{
         INFO: interval - переодичность с которой отрабатывает cb до тех пор пока cb не вернёт true
                          и тогда отработает then.
 
-              rejectCutoff - в случае заданного interval мы ждём когда вернёт cb true, этот параметр задаёт отсечку по времени
+              cutoffTime - в случае заданного interval мы ждём когда вернёт cb true, этот параметр задаёт отсечку по времени
                              спустя которое cb перестанет вызываться даже если true не будет. Отработает в таком случае reject
       */
 
@@ -29,6 +29,7 @@ export class DelaysPromise{
       const options = {
         isActive: true
       }
+      
 
       const idInterval = setInterval(
         () => {
@@ -52,6 +53,7 @@ export class DelaysPromise{
         },
         config.interval < 200 ? 200 : config.interval
       );
+
       setId(idInterval);
       controlAction({
         getIsActiveEvent: () => options.isActive,
@@ -60,9 +62,9 @@ export class DelaysPromise{
           options.isActive = false;
           clearInterval(idInterval);
           setId(null);
-          status === false 
-          ? reject({ status: false, msg: msg + ': (false)' }) 
-          : resolve({ status: true, msg: msg + ': (true)' });
+          status  
+          ? resolve({ status, msg: msg + ': (true)' })
+          : reject({ status, msg: msg + ': (false)' }) 
         }
       })
     });

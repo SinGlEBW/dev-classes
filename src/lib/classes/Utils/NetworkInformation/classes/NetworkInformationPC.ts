@@ -4,7 +4,7 @@ import { NetworkInformationAbstract, type WatcherCB } from './types/types.abscru
 export class NetworkInformationPC extends NetworkInformationAbstract{
   private network = new InternetWatchers();
   protected watchers = (cb: WatcherCB) => {
-    navigator.onLine ? cb(true) : cb(false)
+    navigator.onLine ? cb(true, "network") : cb(false, "none")
     this.network.addWatchers(cb);
   }
   getControls = () => ({

@@ -55,7 +55,7 @@ export class WsApi {
     const data = JSON.parse(e.data ? e.data : "{}");
     try {
       const { action } = data;
-      action && this.setResponceInReqSave(data);
+      action && this.filterSaveItemsByResponse(data);
       this.events.publish("msg", data);
     } catch (error) {
       this.events.publish("msg", JSON.parse("{}"));
@@ -70,35 +70,45 @@ export class WsApi {
     return JSON.parse(JSON.stringify(state));
   }
 
-  private setResponceInReqSave(responce: { action: string; [key: string]: any }) {
+  private filterSaveItemsByResponse(response: { action: string; [key: string]: any }) {
     const requestSave = this.getRequestSave();
     const filterArrSaveReq: any[] = [];
     for (let i = 0; i < requestSave.length; i++) {
       const itemReq = requestSave[i];
-      if (itemReq.payload.action !== responce.action) {
+      if (itemReq.payload.action !== response.action) {
         filterArrSaveReq.push(itemReq);
       } else {
-        itemReq.cb && itemReq.cb(responce);
+        itemReq.cb && itemReq.cb(response);
       }
     }
     this.state.arrSaveReq = filterArrSaveReq;
   }
 
-  private removeRequestItemSave(action: string) {
-    const newTotalRequestSave = this.state.arrSaveReq.filter((item) => item.payload?.action !== action);
-    this.state.arrSaveReq = newTotalRequestSave;
-  }
 
   private errorInitSocket = () => {
     console.error("Вы не установили опции");
   };
 
+  private setStatus = (status: WsApiE_StatusConnect_OR) => {
+    this.events.publish("status", status);
+    this.setState({ statusConnect: status });
+  };
+
   /*----------------------------------------------------------------------------------------------------------*/
-  getRegisteredEvents = () => this.events.getListNameEvents();
-  send(data) {
-    const messageSend = JSON.stringify(data);
-    this.state.ws?.send(messageSend);
-  }
+  
+  getSocket = () => this.state.ws;
+  getStatusSocket = () => this.state.statusConnect;
+  getRequestSave = () => this.state.arrSaveReq;
+  getOptions = () => this.options;
+  getRegisteredEvents = this.events.getListNameEvents;
+  on = this.events.subscribe;
+  off = this.events.unsubscribe;
+
+
+  init = (options: typeof this.options) => {
+    this.initOptions = true;
+    this.options = { ...this.options, ...options };
+  };
 
   getIsInitWS = () => {
     const status = this.initOptions;
@@ -107,37 +117,7 @@ export class WsApi {
     }
     return status;
   };
-  getSocket = () => this.state.ws;
-
-  getOptions = () => this.options;
-
-  init = (options: typeof this.options) => {
-    this.initOptions = true;
-    this.options = { ...this.options, ...options };
-  };
-
-  getStatusSocket = () => this.state.statusConnect;
-
-  private setStatus = (status: WsApiE_StatusConnect_OR) => {
-    this.events.publish("status", status);
-    this.setState({ statusConnect: status });
-  };
-
-  on = this.events.subscribe;
-  off = this.events.unsubscribe;
-
-  setRequestSave(reqInfo: (typeof this.state.arrSaveReq)[number]) {
-    if ("action" in reqInfo.payload) {
-      const findItemInx = this.state.arrSaveReq.findIndex((item) => item.payload.action === reqInfo.payload.action);
-      if (~findItemInx) {
-        this.state.arrSaveReq[findItemInx] = reqInfo;
-      } else {
-        this.state.arrSaveReq.push(reqInfo);
-      }
-    }
-  }
-
-  getRequestSave = () => this.state.arrSaveReq;
+ 
   connect() {
     if (this.initOptions) {
       this.close();
@@ -157,5 +137,21 @@ export class WsApi {
   disconnect() {
     this.close();
     this.resetState();
+  }
+
+  send(data) {
+    const messageSend = JSON.stringify(data);
+    this.state.ws?.send(messageSend);
+  }
+
+  setRequestSave(reqInfo: (typeof this.state.arrSaveReq)[number]) {
+    if ("action" in reqInfo.payload) {
+      const findItemInx = this.state.arrSaveReq.findIndex((item) => item.payload.action === reqInfo.payload.action);
+      if (~findItemInx) {
+        this.state.arrSaveReq[findItemInx] = reqInfo;
+      } else {
+        this.state.arrSaveReq.push(reqInfo);
+      }
+    }
   }
 }
