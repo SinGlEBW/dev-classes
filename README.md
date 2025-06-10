@@ -30,6 +30,18 @@ HTTPSApi.on('fetch', (info) => { })
 HTTPSApi.request({keyAction: 'action1', request: {url: '...'}})
 
 ```
+<h3 align="center">NetworkInformation</h3>
+
+```ts
+import { NetworkInformation, NetworkInformationCordova, NetworkInformationPC } from 'dev-classes';
+
+const internet = new NetworkInformation([new NetworkInformationPC(), new NetworkInformationCordova()]);
+
+internet.run((status, textStatus) => {
+  status ? online() : offline();
+});
+
+```
 <h3 align="center">Color</h3>
 
 ```ts
