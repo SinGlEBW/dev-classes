@@ -85,8 +85,10 @@ export class apiRequest {
           }
         );
       } else {
+        apiRequest.registerRequest.setList({ url, options: requestOptions });
         axios({ url, ...requestOptions })
           .then((res) => {
+            apiRequest.registerRequest.removeItem(url);
             const statusCode: number = res.status;
             const data = res?.data;
             payloadSuccess = { ...payloadSuccess, statusCode, data, res };
