@@ -26,7 +26,7 @@ export interface RejectRequestInServer_P extends FetchCommonApiRequest {
 }
 
 export class apiRequest {
-  private static keyCookie = "Token";
+  private static keyCookie = "AuthCookie";
 
   private static cookieOptions: CookieAttributes = {};
 
@@ -47,7 +47,7 @@ export class apiRequest {
       const defaultRequestOptions: RequestOptions_P = {
         method: "get",
         headers: {
-          cookie: apiRequest.getToken(),
+          cookie: apiRequest.getAuthCookies(),
         },
         timeout: 60000,
       };
@@ -65,7 +65,7 @@ export class apiRequest {
           url,
           requestOptions,
           (res) => {
-            apiRequest.registerFailedRequests.removeItem(url);
+            apiRequest.registerFailedRequests.removeItem(url);//проверить что хотел сделать этим
             apiRequest.registerRequest.removeItem(url);
             //INFO: На будуще в set-cookie может не быть token
             const token = res?.headers && res.headers["set-cookie"];
@@ -102,7 +102,7 @@ export class apiRequest {
     });
   };
 
-  static getToken = () => {
+  static getAuthCookies = () => {
     const { keyCookie } = apiRequest;
     if (window?.cordova?.plugin?.http) {
       const { http } = window?.cordova?.plugin;

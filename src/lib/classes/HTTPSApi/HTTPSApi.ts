@@ -103,7 +103,6 @@ export class HTTPSApi{
       reject(payloadFetch);
     });
   }
-  static removeCookie(){
-    apiRequest.removeAuthCookie();
-  }
+  static removeAuthCookie = apiRequest.removeAuthCookie
+  static getAuthCookies = apiRequest.getAuthCookies
 }
