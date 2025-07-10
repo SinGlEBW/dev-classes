@@ -65,6 +65,7 @@ export class apiRequest {
           url,
           requestOptions,
           (res) => {
+            console.log("http.sendRequest success: ", res)
             apiRequest.registerFailedRequests.removeItem(url);//проверить что хотел сделать этим
             apiRequest.registerRequest.removeItem(url);
             //INFO: На будуще в set-cookie может не быть token
@@ -79,6 +80,7 @@ export class apiRequest {
             resolve(payloadSuccess as any);
           },
           (err) => {
+            console.log("http.sendRequest error: ", err)
             const errorsData = apiRequest.errorsHandler.handleError(err);
 
             reject({ ...payloadError, ...errorsData, errExt: err });

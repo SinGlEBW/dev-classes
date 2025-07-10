@@ -4,6 +4,9 @@ export class ErrorsHandler{
     if ('message' in err) {
       errorPayload.msg = err.message;
     } 
+    if ('error' in err) {
+      errorPayload.msg = err.error;
+    } 
     if('status' in err){
       errorPayload.statusCode = err.status;
     }
