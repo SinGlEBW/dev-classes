@@ -1,2 +1,2 @@
 export * from './Color';
-export type { ColorProps } from './Color.types';
+export type { ColorProps, Color_P } from './Color.types';
