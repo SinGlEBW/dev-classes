@@ -12,4 +12,20 @@ export class ErrorsHandler{
     }
     return errorPayload;
   }
+  getErrorMessageFromData(errorData: { [s: string]: string; }){
+    let message = "";
+    const listKeysError = ["message", "msg", "error", "Message", "Messages", "Error", "Errors"]
+    const entriesErrorData = Object.entries<string>(errorData);
+
+    for(let [key, value] of entriesErrorData){
+      const is = listKeysError.includes(key);
+      if(is){
+        message = value;
+        break;
+      }
+    }
+   
+
+    return message;
+  }
 }

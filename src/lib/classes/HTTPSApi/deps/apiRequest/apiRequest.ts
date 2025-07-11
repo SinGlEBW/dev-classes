@@ -22,7 +22,17 @@ export interface ResolveRequestInServer_P<ResT> extends FetchCommonApiRequest {
 export interface RejectRequestInServer_P extends FetchCommonApiRequest {
   isErr: boolean;
   msg: string;
-  errExt?: { [key: string]: any };
+  request: RequestOptions_P;
+  errExt?: { 
+    code?: string;
+    config?: AxiosRequestConfig;
+    headers?: object;
+    message: string;
+    status: number;
+    data?:any;
+    statusText?: string;
+    stack?: string;
+  };
 }
 
 export class apiRequest {
@@ -42,8 +52,7 @@ export class apiRequest {
   static requestInServer = <ResT = any, T extends object = ResolveRequestInServer_P<ResT>>(url: string, options: RequestOptions_P = {}) => {
     return new Promise<T>((resolve, reject: (dataErr: RejectRequestInServer_P) => void) => {
       let payloadSuccess = { url, statusCode: 0, data: {}, res: {} };
-      const payloadError: RejectRequestInServer_P = { url, statusCode: 520, msg: "", isErr: true, errExt: {} };
-
+  
       const defaultRequestOptions: RequestOptions_P = {
         method: "get",
         headers: {
@@ -54,6 +63,19 @@ export class apiRequest {
 
       const requestOptions = Utils.deepMerge(defaultRequestOptions, options);
   
+
+      const defaultStatus = 520;
+      const defaultMessage = "";
+      const payloadError: RejectRequestInServer_P = {
+        url, 
+        statusCode: defaultStatus, 
+        msg: defaultMessage, 
+        isErr: true, 
+        request: requestOptions,
+        errExt: { message: defaultMessage, status: defaultStatus } 
+      };
+
+
       if (window?.cordova && window?.cordova?.plugin?.http) {
         const { http } = window?.cordova?.plugin;
 
@@ -82,8 +104,24 @@ export class apiRequest {
           (err) => {
             console.log("http.sendRequest error: ", err)
             const errorsData = apiRequest.errorsHandler.handleError(err);
+            const { url, status, headers, error } = err;
+            const isJSON = Utils.isJSON(error);
 
-            reject({ ...payloadError, ...errorsData, errExt: err });
+            const errExt: RejectRequestInServer_P["errExt"] = { 
+              headers,
+              status,
+              message: "", 
+            };
+            
+            if(isJSON){
+              const parseError = JSON.parse(error);
+              errExt.message = apiRequest.errorsHandler.getErrorMessageFromData(parseError);
+              errExt.data = parseError;
+            }if(typeof error === "string"){
+              errExt.message = error;
+            }
+
+            reject({ ...payloadError, ...errorsData, errExt });
           }
         );
       } else {
@@ -98,7 +136,18 @@ export class apiRequest {
           })
           .catch((err: AxiosError) => {
             const errorsData = apiRequest.errorsHandler.handleError(err);
-            reject({ ...payloadError, ...errorsData, errExt: err });
+            const { code, config, status,  message, response, stack } = err;
+            const errExt: RejectRequestInServer_P["errExt"] = { 
+              code, 
+              config, 
+              status: status ? status : defaultStatus,
+              message, 
+              headers: response?.headers,
+              statusText: response?.statusText,
+              data: response?.data,
+              stack,
+            };
+            reject({ ...payloadError, ...errorsData, errExt });
           });
       }
     });
