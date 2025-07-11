@@ -6,14 +6,25 @@ export class NetworkInformationCordova extends NetworkInformationAbstract{
     const cbError = (err) => { console.error(err); }
     const watcher = (status: CordovaNetworkStatus) => {
 
-      console.dir('watcher status', status);
+      console.log('watchers cb', cb);
+      console.log('watcher status', status);
+      const is = !["none", "unknown"].includes(status);
       // cb(!(status === "unknown" || status === "none"), status)
-      cb(!["none", "unknown"].includes(status), status)
+      cb(is, status)
     }
 
 
     if ((navigator as any)?.connection && "getInfo" in (navigator as any)?.connection) {
-      (navigator as any)?.connection.getInfo(watcher, cbError)
+      // (navigator as any)?.connection.getInfo(watcher, cbError)
+      const getStatus = () => (navigator as any)?.connection?.type;
+      const networkWatcher = () => {
+        const typeNetwork = getStatus();
+        watcher(typeNetwork)
+      }
+      networkWatcher();
+      document.addEventListener("offline", networkWatcher, false);
+      document.addEventListener("online", networkWatcher, false);
+
     }else{
       console.error("Нету navigator.connection.getInfo");
     }

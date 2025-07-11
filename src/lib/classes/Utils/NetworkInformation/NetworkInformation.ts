@@ -19,7 +19,9 @@ export class NetworkInformation {
   run(watcher: WatcherCB) {
     const nameSystem = this.getSystem()
     const findControlsthis = this.listNetworkInformation.find(ni => ni.getControls().system === nameSystem);
+    
     if(findControlsthis){
+      
       findControlsthis.getControls().addWatchers(watcher)
     }else{
       console.error(`NetworkInformation не активен на данной платформе`);
