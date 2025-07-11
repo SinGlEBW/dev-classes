@@ -112,7 +112,7 @@ export class apiRequest {
               status,
               message: "", 
             };
-            
+              console.log("isJSON: ", isJSON)
             if(isJSON){
               const parseError = JSON.parse(error);
               errExt.message = apiRequest.errorsHandler.getErrorMessageFromData(parseError);
