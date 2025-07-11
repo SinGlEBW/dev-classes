@@ -12,6 +12,7 @@ export class InternetWatchers {
   private resetState = () => this.state = defaultState;
   addWatchers(cb: WatcherCB){
     if(!this.state.isWatcher){
+      console.log('InternetWatchers.addWatchers')
       this.state.isWatcher = true;
       const list = [
         {event: 'online', status: true, textStatus: 'network'},

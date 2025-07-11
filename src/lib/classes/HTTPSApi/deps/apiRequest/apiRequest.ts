@@ -117,7 +117,7 @@ export class apiRequest {
               const parseError = JSON.parse(error);
               errExt.message = apiRequest.errorsHandler.getErrorMessageFromData(parseError);
               errExt.data = parseError;
-            }if(typeof error === "string"){
+            }else if(typeof error === "string"){
               errExt.message = error;
             }
 
