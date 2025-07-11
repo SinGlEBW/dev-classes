@@ -87,7 +87,7 @@ export class apiRequest {
           url,
           requestOptions,
           (res) => {
-            console.log("http.sendRequest success: ", res)
+            // console.log("http.sendRequest success: ", res)
             apiRequest.registerFailedRequests.removeItem(url);//проверить что хотел сделать этим
             apiRequest.registerRequest.removeItem(url);
             //INFO: На будуще в set-cookie может не быть token
@@ -112,7 +112,6 @@ export class apiRequest {
               status,
               message: "", 
             };
-              console.log("isJSON: ", isJSON)
             if(isJSON){
               const parseError = JSON.parse(error);
               errExt.message = apiRequest.errorsHandler.getErrorMessageFromData(parseError);
