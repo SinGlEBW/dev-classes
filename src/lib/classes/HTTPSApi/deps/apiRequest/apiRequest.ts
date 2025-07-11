@@ -102,9 +102,10 @@ export class apiRequest {
             resolve(payloadSuccess as any);
           },
           (err) => {
-            console.log("http.sendRequest error: ", err)
+          
             const errorsData = apiRequest.errorsHandler.handleError(err);
             const { url, status, headers, error, ...a } = err;
+  
             const isJSON = typeof error === "string" ? Utils.isJSON(error.trim()) : false;
 
             const errExt: RejectRequestInServer_P["errExt"] = { 
@@ -112,10 +113,13 @@ export class apiRequest {
               status,
               message: "", 
             };
+
             if(isJSON){
-              const parseError = JSON.parse(error);
-              errExt.message = apiRequest.errorsHandler.getErrorMessageFromData(parseError);
+              const parseError = JSON.parse(error.trim());
+              const message = apiRequest.errorsHandler.getErrorMessageFromData(parseError);
+              errExt.message = message;
               errExt.data = parseError;
+              errorsData.msg = message
             }else if(typeof error === "string"){
               errExt.message = error;
             }
