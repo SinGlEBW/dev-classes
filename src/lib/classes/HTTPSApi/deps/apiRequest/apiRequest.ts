@@ -105,7 +105,7 @@ export class apiRequest {
             console.log("http.sendRequest error: ", err)
             const errorsData = apiRequest.errorsHandler.handleError(err);
             const { url, status, headers, error, ...a } = err;
-            const isJSON = Utils.isJSON(error);
+            const isJSON = typeof error === "string" ? Utils.isJSON(error.trim()) : false;
 
             const errExt: RejectRequestInServer_P["errExt"] = { 
               headers,
