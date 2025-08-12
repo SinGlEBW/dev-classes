@@ -3,7 +3,7 @@ import { NetworkInformationCordova, NetworkInformationPC } from "@classes/Utils/
 import uuid4 from "uuid4";
 import { EventSubscribers } from "../Utils/EventSubscribers/EventSubscribers";
 import { NetworkInformation } from "../Utils/NetworkInformation/NetworkInformation";
-import type { SocketApi_Options_P, SocketApi_State_P } from "./SocketApi.types";
+import type { SocketApi_Options_P, SocketApi_StateProps_P } from "./SocketApi.types";
 import { WsApi, WsApi_Options_P } from "./deps/WsApi";
 /*
   TODO: Передавать опции
@@ -19,7 +19,7 @@ interface SocketApi_Events {
 }
 
 export class SocketApi {
-  private static state: SocketApi_State_P = {
+  private static state: SocketApi_StateProps_P = {
     isDisconnect: true,
     isActiveReConnect: false,
     isOfflineSocket: true,
@@ -189,30 +189,30 @@ export class SocketApi {
 
       SocketApi.connect();
       const { timeReConnect, numberOfRepit } = SocketApi.wsApi.getOptions();
-      SocketApi.delay
-        .startActionEvery(
-          () => {
-            console.log("reconnect:>>delay");
-            if (SocketApi.wsApi.getStatusSocket() === "ready") {
-              console.dir("Подключение установлено");
-              return true;
-            }
-            SocketApi.connect();
-            return false;
-          },
-          {
-            interval: timeReConnect,
-            countAction: numberOfRepit,
-            watchIdInterval: (id) => {
-              SocketApi.saveID.idReConnect = id;
-            },
-            controlAction: ({ stop, getIsActiveEvent }) => {
-              SocketApi.stopReConnect = stop;
-            },
+      const delayControlActionEvery = SocketApi.delay.startActionEvery(
+        () => {
+          console.log("reconnect:>>delay");
+          if (SocketApi.wsApi.getStatusSocket() === "ready") {
+            console.dir("Подключение установлено");
+            return true;
           }
-        )
-        .then(SocketApi.setInfoConnect)
-        .catch(SocketApi.setInfoConnect);
+          SocketApi.connect();
+          return false;
+        },
+        {
+          interval: timeReConnect,
+          countAction: numberOfRepit,
+          watchIdInterval: (id) => {
+            SocketApi.saveID.idReConnect = id;
+          },
+          controlAction: ({ stop, getIsActiveEvent }) => {
+            SocketApi.stopReConnect = stop;
+          },
+        }
+      );
+
+      delayControlActionEvery.promise.then(SocketApi.setInfoConnect).catch(SocketApi.setInfoConnect);
+      
     } else {
       console.groupCollapsed("Процесс socketReConnect уже запущен");
       console.log("SocketApi.saveID: ", SocketApi.saveID);
@@ -220,7 +220,6 @@ export class SocketApi {
     }
   };
 }
-
 
 // const idInterval = setInterval(() => {
 //   const isActive = getIsActiveEvent()

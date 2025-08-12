@@ -146,7 +146,10 @@ interface OneOfPromiseReject{
 
 
 interface DelaysPromiseProps{
-  startActionEvery: (cb: () => boolean, config: StartActionEveryConfigI) => Promise<{status: boolean, msg: string}>
+   startActionEvery: (cb: () => boolean, config: StartActionEveryConfigI) => {
+    stop: ControlAction['stop'],
+    promise: Promise<{status: boolean, msg: string}>
+  }
   oneOf: (watchPromise: () => Promise<any>, potentialCaseCB: () => void, config: {second: number}) => void
   oneOfPromise:(watchPromise: () => Promise<any>, cbPotentialReject: (p:OneOfPromiseReject) => OneOfPromiseReject, config: {second: number}) => Promise<any>
 }

@@ -2,14 +2,14 @@
   "name": "dev-classes",
   "private": false,
   "author": "SinGlEBW",
+  "homepage": "https://github.com/SinGlEBW/dev-classes#readme",
+  "bugs": {
+    "url": "https://github.com/SinGlEBW/dev-classes/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/SinGlEBW/dev-classes.git"
   },
-  "bugs": {
-    "url": "https://github.com/SinGlEBW/dev-classes/issues"
-  },
-  "homepage": "https://github.com/SinGlEBW/dev-classes#readme",
   "license": "MIT",
   "version": "1.3.27",
   "type": "module",
@@ -38,7 +38,8 @@
   "scripts": {
     "start": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "publish": "node publishVersion.js"
   },
   "devDependencies": {
     "@types/js-cookie": "^3.0.6",

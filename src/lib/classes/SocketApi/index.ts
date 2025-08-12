@@ -1,2 +1,2 @@
 export * from './SocketApi'
-export { type SocketApi_State_P } from './SocketApi.types' 
+export { type SocketApi_StateProps_P, type SocketApi_StatusConnect_OR } from './SocketApi.types'
