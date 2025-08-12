@@ -5,18 +5,21 @@ import { EventSubscribers } from "../Utils/EventSubscribers/EventSubscribers";
 import { NetworkInformation } from "../Utils/NetworkInformation/NetworkInformation";
 import type { SocketApi_Options_P, SocketApi_StateProps_P } from "./SocketApi.types";
 import { WsApi, WsApi_Options_P } from "./deps/WsApi";
+import type { WsApi_Events } from './deps/WsApi/WsApi.types';
 /*
   TODO: Передавать опции
   SocketApi.init({
     isReconnect: true//Если появиться интернет
   })
 */
-//Последняя версия
+
 
 interface SocketApi_Events {
   timeOffReConnect(info: { status: boolean; msg: string }): void;
   reConnect(status: boolean): void;
 }
+
+type CommonEvents = SocketApi_Events & WsApi_Events;
 
 export class SocketApi {
   private static state: SocketApi_StateProps_P = {
@@ -92,14 +95,16 @@ export class SocketApi {
   };
   /*---------------------------------------------------------------------------------------------------------------------------*/
   static getState = () => SocketApi.state;
-  static on: typeof SocketApi.wsApi.on & typeof SocketApi.events.subscribe = (name, listener) => {
+  
+  static on: <K extends keyof CommonEvents>(name: K, cb: CommonEvents[K]) => void  = (name, listener) => {
     const wsApi_RegisteredEvents = SocketApi.wsApi.getRegisteredEvents();
     if (!wsApi_RegisteredEvents.includes(name)) {
-      SocketApi.events.subscribe(name, listener);
+      SocketApi.events.subscribe(name as any, listener) ;
     } else {
-      SocketApi.wsApi.on(name, listener);
+      SocketApi.wsApi.on(name as any, listener);
     }
   };
+
   static off: typeof SocketApi.wsApi.on & typeof SocketApi.events.subscribe = (name, listener) => {
     const wsApi_RegisteredEvents = SocketApi.wsApi.getRegisteredEvents();
     if (!wsApi_RegisteredEvents.includes(name)) {

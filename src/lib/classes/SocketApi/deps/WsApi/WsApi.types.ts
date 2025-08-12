@@ -8,8 +8,8 @@ export interface WsApi_Options_P {
 export type WsApiE_StatusConnect_OR = "pending" | "ready" | "error" | "close" | "disconnect";
 
 export interface WsApi_Events {
-  status: (status: WsApiE_StatusConnect_OR) => void
-  msg: (message: any) => void
+  status(status: WsApiE_StatusConnect_OR): void
+  msg(message: any): void
 }
 
 export interface WsApi_StateProps {

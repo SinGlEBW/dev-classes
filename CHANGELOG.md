@@ -34,3 +34,7 @@ useEffect(() => {
 ### Added
 - Добавлен метод SocketApi.getRequestSave
 
+## [1.3.30] - 2025-08-12
+### Fixed
+- Отображение событий SocketApi.on
+

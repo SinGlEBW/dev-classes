@@ -3,6 +3,8 @@ import type { WsApi_Events, WsApi_Options_P, WsApi_StateProps, WsApiE_StatusConn
 
 //INFO: Назначать функции стрелочными иначе this не читаем
 
+
+
 export class WsApi {
   private options: WsApi_Options_P = {
     timeReConnect: 5000,
