@@ -38,3 +38,7 @@ useEffect(() => {
 ### Fixed
 - Отображение событий SocketApi.on
 
+## [1.3.31] - 2025-08-12
+### Added
+- Добавлен проброс типов generetic types в controlDelay.oneOfPromise & controlDelay.oneOf 
+

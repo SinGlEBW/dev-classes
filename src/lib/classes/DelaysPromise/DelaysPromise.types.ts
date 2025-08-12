@@ -21,6 +21,6 @@ export interface DelaysPromiseProps{
     stop: ControlAction['stop'],
     promise: Promise<{status: boolean, msg: string}>
   }
-  oneOf: (watchPromise: () => Promise<any>, potentialCaseCB: () => void, config: {second: number}) => void
-  oneOfPromise:(watchPromise: () => Promise<any>, cbPotentialReject: (p:OneOfPromiseReject) => OneOfPromiseReject, config: {second: number}) => Promise<any>
+  oneOf: <T = any>(watchPromise: () => Promise<T>, potentialCaseCB: () => void, config: {second: number}) => void
+  oneOfPromise:<T = any>(watchPromise: () => Promise<any>, cbPotentialReject: (p:OneOfPromiseReject) => OneOfPromiseReject, config: {second: number}) => Promise<T>
 }
