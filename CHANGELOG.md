@@ -30,4 +30,7 @@ useEffect(() => {
 }, []
 ```
    
+## [1.3.29] - 2025-08-12
+### Added
+- Добавлен метод SocketApi.getRequestSave
 

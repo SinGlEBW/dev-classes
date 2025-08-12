@@ -108,7 +108,7 @@ export class SocketApi {
       SocketApi.wsApi.off(name, listener);
     }
   };
-  // static getRequestSave = SocketApi.wsApi.getRequestSave;
+  static getRequestSave = SocketApi.wsApi.getRequestSave;
   static getStatusSocket = SocketApi.wsApi.getStatusSocket;
   static close = () => {
     if (SocketApi.state.isActiveReConnect) {
@@ -171,12 +171,6 @@ export class SocketApi {
   }
 
   /*------------------------------------------------------------------------------------------------------*/
-
-  // useEffect(() => {
-  //   if((isReConnectSocket && (!isNetworkStatus || statusWS === 'ready'))){
-  //     SocketApi.stopReConnect();
-  //   }
-  // },[isReConnectSocket, isNetworkStatus, statusWS]);
 
   static socketReConnect = () => {
     if (!SocketApi.wsApi.getIsInitWS()) {
