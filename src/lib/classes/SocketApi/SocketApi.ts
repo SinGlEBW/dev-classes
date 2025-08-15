@@ -164,7 +164,7 @@ export class SocketApi {
       console.log("Нет подключения к сокету");
       return;
     }
-    SocketApi.wsApi.send(JSON.stringify(data));
+    SocketApi.wsApi.send(data);
   }
 
   static stopReConnect(status?: boolean) {

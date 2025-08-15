@@ -42,3 +42,7 @@ useEffect(() => {
 ### Added
 - Добавлен проброс типов generetic types в controlDelay.oneOfPromise & controlDelay.oneOf 
 
+## [1.3.32] - 2025-08-15
+### Fixed
+- Исправлен формат отправки сообщений через SocketApi.send 
+
