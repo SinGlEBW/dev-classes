@@ -93,7 +93,8 @@ export class apiRequest {
             //INFO: На будуще в set-cookie может не быть token
             const token = res?.headers && res.headers["set-cookie"];
             const statusCode: number = res.status;
-            const data = res?.data;
+            
+            const data = Utils.isJSON(res?.data) ? JSON.parse(res?.data) : res?.data;    
             payloadSuccess = { ...payloadSuccess, statusCode, data, res };
             if (statusCode === 200 && token) {
               apiRequest.saveToken(token);
