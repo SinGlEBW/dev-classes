@@ -50,3 +50,7 @@ useEffect(() => {
 ### Fixed
 - Исправлено возвращаемое значение в HTTPSApi.request
 
+## [1.3.35] - 2025-08-18
+### Fixed
+- Исправлено ожидание статуса close при вызове SocketApi.close()
+

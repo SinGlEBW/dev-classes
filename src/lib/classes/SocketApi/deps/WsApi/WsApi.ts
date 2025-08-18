@@ -29,6 +29,7 @@ export class WsApi {
     this.state = { ...this.state, ...state };
   }
   private eventListener = (action: "add" | "remove") => {
+ 
     const entriesSocketEvents = [
       ["open", this.openHandler],
       ["close", this.closeHandler],
@@ -65,6 +66,7 @@ export class WsApi {
   };
 
   private errHandler = (err) => {
+    console.log("errHandler",err)
     this.setStatus("error");
   };
 
@@ -134,6 +136,7 @@ export class WsApi {
   close() {
     this.state.ws?.close();
     this.eventListener("remove");
+    this.setStatus("close");
   }
 
   disconnect() {
