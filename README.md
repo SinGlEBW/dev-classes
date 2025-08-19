@@ -1,24 +1,6 @@
 <h3 align="center">SocketApi</h3>
-
-```ts
-import { SocketApi } from 'dev-classes';
-
-SocketApi.init({
-  url: 'wss://...',
-  timeReConnect: 5000,
-  numberOfRepit: 5,
-  isReConnectNetworkOnline: true
-});
-
-SocketApi.on('status', (status) => { console.log('onStatus', status); });
-SocketApi.on('msg', (messages) => { console.log('onMessages', messages); });
-SocketApi.on('reConnect', (status) => { console.log('reConnect', status); });
-SocketApi.on('timeOffReConnect', (data) => { console.log('timeOffReConnect', data); });
-
-SocketApi.connect();
-//...
-
-```
+  ### !!! Пакет пепеехал в lib-socket-api !!!
+  
 <h3 align="center">HTTPSApi</h3>
 
 ```ts
