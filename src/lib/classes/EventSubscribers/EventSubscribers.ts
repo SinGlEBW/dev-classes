@@ -27,6 +27,9 @@ export class EventSubscribers<EventsProps extends {[K in keyof EventsProps]: (..
     }
   }
   resetSubscribers:EventSubscribersProps<EventsProps>['resetSubscribers'] = () => {
-    this.subscribersEvents = {}
+    const entries = Object.entries(this.subscribersEvents);
+    for(const [key, value] of entries){
+      this.subscribersEvents[key] = []
+    }
   }
 }

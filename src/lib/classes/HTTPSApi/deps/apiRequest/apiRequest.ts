@@ -61,7 +61,7 @@ export class apiRequest {
         timeout: 60000,
       };
 
-      const requestOptions = Utils.deepMerge(defaultRequestOptions, options);
+      const requestOptions:any = Utils.deepMerge(defaultRequestOptions, options);
   
 
       const defaultStatus = 520;
@@ -78,8 +78,15 @@ export class apiRequest {
 
       if (window?.cordova && window?.cordova?.plugin?.http) {
         const { http } = window?.cordova?.plugin;
-
-        http.setDataSerializer("json");
+        if('Content-Type' in (requestOptions as any)?.headers){
+          if(requestOptions?.headers['Content-Type'] === 'multipart/form-data'){
+            http.setDataSerializer("urlencoded");
+          }
+          if(requestOptions?.headers['Content-Type'] === 'application/json'){
+            http.setDataSerializer("json");
+          }
+        }
+        // http.setDataSerializer("json");
         http.setRequestTimeout(Number(requestOptions.timeout) / 1000);
 
         apiRequest.registerRequest.setList({ url, options: requestOptions });

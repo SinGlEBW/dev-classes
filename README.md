@@ -235,3 +235,13 @@ MyClass.on('myEvent', (status) => {
 MyClass.runTime(2);
 
 ```
+
+<h3 align="center">NetworkStatusTracker</h3>
+
+```ts
+// Будущая замена NetworkInformation
+  const networkTicker = new NetworkStatusTracker([]);
+  networkTicker.startEvents((info) => {
+    SocketApi.setNetworkStatus(info);
+  });
+```

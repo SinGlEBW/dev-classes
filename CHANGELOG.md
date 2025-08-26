@@ -58,3 +58,8 @@ useEffect(() => {
 ### Remove
 - Перенос пакета SocketApi в отдельную библиотеку lib-socket-api для последующего исользования в связке с компонентами react в библиотеке  rc-lib-ui
 
+## [1.4.10] - 2025-08-26
+### Added
+- NetworkStatusTracker
+### Fixed
+- EventSubscribers.resetSubscribers

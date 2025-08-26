@@ -2,7 +2,7 @@ import { NetworkInformation } from '@classes/Utils/NetworkInformation/NetworkInf
 import { apiRequest, RejectRequestInServer_P, type ResolveRequestInServer_P } from './deps/apiRequest/apiRequest';
 import type { FetchCommonPayloadHTTPSApi, FetchInfoHTTPSApi, HTTPSApi_Events, RequestPayloadHTTPSApi, ResponseErrorHTTPSApi } from './HTTPSApi.types';
 import { NetworkInformationCordova, NetworkInformationPC } from '@classes/Utils/NetworkInformation/classes';
-import { EventSubscribers } from '@classes/Utils/EventSubscribers/EventSubscribers';
+import { EventSubscribers } from '@classes/EventSubscribers/EventSubscribers';
 
 
 export class HTTPSApi{
@@ -92,6 +92,8 @@ export class HTTPSApi{
           })
           .catch((dataErr: RejectRequestInServer_P) => {
             const errorPayload:ResponseErrorHTTPSApi = { 
+              //TODO: Проверить. dataErr не верно возвращает
+              
               isReq: false, isReload: false, keyAction, ...dataErr, 
             };
             HTTPSApi.events.publish("fetch", errorPayload);
