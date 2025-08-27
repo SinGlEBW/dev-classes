@@ -12,7 +12,7 @@ export class ErrorsHandler{
     }
     return errorPayload;
   }
-  getErrorMessageFromData(errorData: { [s: string]: string; }){
+  getErrorMessageFromData(status: number, errorData: { [s: string]: string; }){
     let message = "";
     const listKeysError = ["message", "msg", "error", "Message", "Messages", "Error", "Errors"]
     const entriesErrorData = Object.entries<string>(errorData);
@@ -24,8 +24,23 @@ export class ErrorsHandler{
         break;
       }
     }
-   
-
+  
+    return message;
+  }
+  gerErrorByStatusCordovaHttp(status: number, url: string){
+    let message = "";
+    if([-1, -4].includes(status)){
+      message = 'Нет возможности подключиться к серверу';
+    }else 
+    if(status === -3){
+      message = `Не удается разрешить хост ${url}: Нет адреса, связанного с именем хоста`
+    }else
+    if(status === -6){
+      message = `Нет доступа к сети`
+    }
+    if(status === -8){
+      console.log('download aborted');
+    }
     return message;
   }
 }

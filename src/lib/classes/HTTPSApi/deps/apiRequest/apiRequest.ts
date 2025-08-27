@@ -124,7 +124,7 @@ export class apiRequest {
 
             if(isJSON){
               const parseError = JSON.parse(error.trim());
-              const message = apiRequest.errorsHandler.getErrorMessageFromData(parseError);
+              const message = apiRequest.errorsHandler.getErrorMessageFromData(status, parseError);
               errExt.message = message;
               errExt.data = parseError;
               errorsData.msg = message

@@ -63,3 +63,7 @@ useEffect(() => {
 - NetworkStatusTracker
 ### Fixed
 - EventSubscribers.resetSubscribers
+
+## [1.4.11] - 2025-08-27
+### Changed
+- Изменены зависимости peerDependencies
