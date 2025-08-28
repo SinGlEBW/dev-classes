@@ -18,12 +18,12 @@ export interface HTTPSApi_Events{
 } 
 
 
-declare global {
-  interface Window{
-    cordova: {
-      plugin: {
-        http: any
-      }
-    }
-  }
-}
+// declare global {
+//   interface Window{
+//     cordova: {
+//       plugin: {
+//         http: any
+//       }
+//     }
+//   }
+// }

@@ -75,9 +75,9 @@ export class apiRequest {
         errExt: { message: defaultMessage, status: defaultStatus } 
       };
 
-
-      if (window?.cordova && window?.cordova?.plugin?.http) {
-        const { http } = window?.cordova?.plugin;
+      const { cordova } = window as any;
+      if (cordova?.cordova && cordova?.plugin?.http) {
+        const { http } = cordova?.plugin;
         if('Content-Type' in (requestOptions as any)?.headers){
           if(requestOptions?.headers['Content-Type'] === 'multipart/form-data'){
             http.setDataSerializer("urlencoded");
@@ -166,8 +166,9 @@ export class apiRequest {
 
   static getAuthCookies = () => {
     const { keyCookie } = apiRequest;
-    if (window?.cordova?.plugin?.http) {
-      const { http } = window?.cordova?.plugin;
+    const { cordova } = window as any
+    if (cordova?.plugin?.http) {
+      const { http } = cordova?.plugin;
       return http.getCookieString(keyCookie);
     }
     return Cookies.get(keyCookie);
@@ -176,9 +177,9 @@ export class apiRequest {
   static saveToken = (token: string) => {
     if (token) {
       const { keyCookie, cookieOptions } = apiRequest;
-
-      if (window?.cordova?.plugin?.http) {
-        const { http } = window?.cordova?.plugin;
+      const { cordova } = window as any
+      if (cordova?.plugin?.http) {
+        const { http } = cordova?.plugin;
         http.setCookie(keyCookie, token, cookieOptions);
         return;
       }
@@ -188,8 +189,9 @@ export class apiRequest {
 
   static removeAuthCookie = () => {
     const { keyCookie } = apiRequest;
-    if (window?.cordova?.plugin?.http) {
-      const { http } = window?.cordova?.plugin;
+    const { cordova } = window as any
+    if (cordova?.plugin?.http) {
+      const { http } = cordova?.plugin;
       http.clearCookies();
       return;
     }

@@ -10,7 +10,8 @@ export class NetworkInformation {
     this.listNetworkInformation = listNetworkInformation;
   } 
   private getSystem(){
-    if(window?.cordova){
+    const { cordova } = window as any
+    if(cordova){
       return 'cordova'
     }
     return 'pc'
