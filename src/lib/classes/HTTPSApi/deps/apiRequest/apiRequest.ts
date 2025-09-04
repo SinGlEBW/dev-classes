@@ -9,6 +9,7 @@ import { Utils } from '@classes/Utils/Utils';
 
 export * from "./types/apiRequest.types";
 
+
 export interface FetchCommonApiRequest {
   statusCode: number;
   url: string;
@@ -48,6 +49,19 @@ export class apiRequest {
   static setMethodUploadToken = (cb: RequestUploadToken_F) => {
     apiRequest.requestUploadToken = cb;
   };
+
+  getDecodingError = () => {
+    return {
+      ERR_BAD_OPTION_VALUE: 'Неправильное значение опции',
+      ERR_DEPRECATED: 'Устаревшая функция',
+      ERR_INVALID_URL: 'Неверный URL-адрес для запроса axios',
+      ECONNABORTED: 'Время ожидания истекло',
+      ERR_BAD_REQUEST: 'Usually related to a response with 4xx status code',
+      ERR_BAD_RESPONSE: 'Сервер не отвечает',
+      ERR_NETWORK: 'Сетевая ошибка',
+    }
+  }
+
 
   static requestInServer = <ResT = any, T extends object = ResolveRequestInServer_P<ResT>>(url: string, options: RequestOptions_P = {}) => {
     return new Promise<T>((resolve, reject: (dataErr: RejectRequestInServer_P) => void) => {
@@ -127,7 +141,7 @@ export class apiRequest {
               const message = apiRequest.errorsHandler.getErrorMessageFromData(status, parseError);
               errExt.message = message;
               errExt.data = parseError;
-              errorsData.msg = message
+              errorsData.msg = apiRequest.errorsHandler.gerErrorByStatusCordovaHttp(status, url) 
             }else if(typeof error === "string"){
               errExt.message = error;
             }
