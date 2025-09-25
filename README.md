@@ -65,6 +65,7 @@ interface ColorProps{
   getTextColor(luminance: number): Color_P['ColorRgb']
   calculateOpacity(luminance: number, targetContrast: number): number;
   clamp(v: number, min: number, max: number): number;
+  isHex(color:string):boolean;
 }
 
 ```

@@ -333,5 +333,10 @@ export class Color {
   static clamp: ColorProps['clamp'] = (v, min, max) => {
     return Math.min(max, Math.max(min, v));
   };
+  static isHex = (color: string) => {
+    if (typeof color !== 'string') return false;
+    const hex = color.replace(/^#/, '');
+    return /^[0-9A-Fa-f]{3}$|^[0-9A-Fa-f]{6}$|^[0-9A-Fa-f]{8}$/.test(hex);
+  };
 }
 
