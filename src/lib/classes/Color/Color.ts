@@ -141,7 +141,7 @@ export class Color {
     return Color.hslaToRgba(arr[0], arr[1], arr[2], alpha);
   }
 
-  static hexaToRgba: ColorProps['hexaToRgba'] = (hexa) => {
+  static hexaToRgba: ColorProps['hexaToRgba'] = (hexa, isNormalizeAlpha) => {
     const arr = [] as any;
     const offset = hexa[0] === "#" ? 1 : 0;
     if (hexa.length === 5 + offset) {
@@ -163,9 +163,12 @@ export class Color {
         arr.push(parseInt(hexa.slice(i, i + 2), 16));
       }
     }
-
+    if(isNormalizeAlpha && arr.length === 4){
+      arr[3] = Math.round((arr[3] / 255) * 100) / 100;
+    }
     return arr;
   }
+
 
   static hexaToHsla:ColorProps['hexaToHsla'] = (hexa) => {
     const rgba = Color.hexaToRgba(hexa);

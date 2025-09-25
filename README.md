@@ -45,7 +45,7 @@ interface ColorProps{
   rgbaToHsla(r: number, g: number, b: number, a: number): Color_P['ColorHsla'];
   hslaToRgba(h: number, s: number, l: number, a: number): Color_P['ColorRgba'];
   hslaStringToRgba(hsla: string): Color_P['ColorRgba'];
-  hexaToRgba(hexa: string): Color_P['ColorRgba'];
+  hexaToRgba(hexa: string, isNormalizeAlpha?: boolean): Color_P['ColorRgba'];
   hexToRgb(hex: string): Color_P['ColorRgb'];
   hexaToHsla(hexa: string): Color_P['ColorHsla'];
   rgbaToHexa(rgba: Color_P['ColorRgba'] | Color_P['ColorRgb'] ): string;
