@@ -175,7 +175,9 @@ interface UtilsProps {
   correctionDataISO8601(date:string):string; 
   hasDateLessPeriod(date: string, period: string, option?:{ dateMinMax: '<=' | '>=' | '<' | '>'; } ): boolean;
   getEndsWithArr(arr: any[], countEnd: number): any[];
-  deepMerge<T extends object = object>(...itemsOb: T[]): T
+  deepMerge<T extends object = object>(...itemsOb: T[]): T;
+  filterItems<T extends Array<{ [key in string]: any } & { name: string }>>(list: T, searchQuery: string): T;
+  sortByOnline <T extends Array<{[key in string]: any} & {name: string, online:boolean}>>(list: T):T
 }
 
 ```

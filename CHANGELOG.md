@@ -81,3 +81,6 @@ useEffect(() => {
 ## [1.4.15] - 2025-08-28
 ### Change
 - Color: hexaToRgba добавлен параметр isNormalizeAlpha приводит альфу из #456789aa [69, 103, 137, 0.67] иначе альфа 170
+## [1.4.16] - 2025-09-26
+### Added
+- Utils: sortByOnline и filterItems добавлено 2 метода
