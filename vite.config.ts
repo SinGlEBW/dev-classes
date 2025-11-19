@@ -6,58 +6,55 @@ import { splitVendorChunkPlugin } from 'vite'
 import packageJson from './package.json';
 
 import { fileURLToPath } from 'node:url';
-import { glob } from 'glob'
 
-// https://vitejs.dev/config/
+
+
 const namePackage = packageJson.name;
-const nameComponent = 'dev-classes';
 const entryPathLib = "src/lib"
+// const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 export default defineConfig({
   plugins: [
-    // libInjectCss(),
-    // dts({ include: ['lib/**/!(*.spec|*.test).{ts,tsx}'] }),
-    dts({ include: entryPathLib })
+    dts({ include: entryPathLib }),
+    libInjectCss()
   ],
   resolve: {
     alias: {
-      "@classes": resolve(__dirname, './src/lib/classes'),
-      "@lib": resolve(__dirname, './src/lib/index'),
+      "@classes": resolve(__dirname, `./${entryPathLib}/classes`),
+      "@lib": resolve(__dirname, `./${entryPathLib}/index`),
     }
   },
-  server: {
-    open: true,
-    
+  server: { open: true },
+  css: {
+    modules: { localsConvention: 'camelCase' }
   },
-  
   build: {
     copyPublicDir: false,
+    cssCodeSplit: false,
     lib: {
-      entry: resolve(__dirname, entryPathLib),
+      entry: {
+        index: entryPathLib + '/index.ts',
+    
+      },
       formats: ['es'],
-      name: nameComponent,
+      name: namePackage,
   
     },
     rollupOptions: {
-      //В пакет не входит external. Пользователь сам это ставит
-      // external: ['react', 'react/jsx-runtime', 'react-dom','react-router-dom', 'styled-components'],//, '@emotion/react', '@emotion/styled', '@mui/material'
-      input: Object.fromEntries(
-          glob.sync(entryPathLib + '/**/*.{ts,tsx}').map(file => [
-            relative(
-              entryPathLib,
-              file.slice(0, file.length - extname(file).length)
-            ),
-            fileURLToPath(new URL(file, import.meta.url))
-          ])
-        ),
+      external: [
+        "react/jsx-runtime",
+        /^@mui\/.*/,
+        /^@emotion\/.*/,
+        ...Object.keys(packageJson.peerDependencies)
+      ],
+ 
       output: {
-        // inlineDynamicImports: false,
-        // assetFileNames: 'assets/[name][extname]',
         entryFileNames: '[name].js',
-        // globals: {
-        //   react: 'React',
-        //   'react-dom': 'ReactDOM',
-        //   "styled-components": "styled"
-        // }
+        globals: {
+          react: 'React',
+          'react-dom': 'ReactDOM',
+          "styled-components": "styled"
+        }
       }
     }
   },

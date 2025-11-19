@@ -11,17 +11,24 @@
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
-    "noImplicitAny": false,
+   
     "isolatedModules": true,
     "noEmit": true,
     "strict": true,
+
+    "noImplicitAny": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
+
     "noFallthroughCasesInSwitch": true,
     "paths": {
       "@classes/*": ["src/lib/classes/*"],
       "@lib": ["src/lib/index"],
     }
   },
-  "include": ["src", "src/lib"]
+  "include": ["src", "src/lib"],
+  "references": [{
+    "path": "./tsconfig.node.json"
+  }],
+  "extends": "./tsconfig.lib.json"
 }

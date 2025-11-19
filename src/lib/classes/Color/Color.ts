@@ -341,5 +341,13 @@ export class Color {
     const hex = color.replace(/^#/, '');
     return /^[0-9A-Fa-f]{3}$|^[0-9A-Fa-f]{6}$|^[0-9A-Fa-f]{8}$/.test(hex);
   };
+  static generateHex:ColorProps['generateHex'] = () => {
+    const hex = Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
+    return `#${hex}`;
+  }
+
+  static generateHexMultiple:ColorProps['generateHexMultiple'] = (count) => {
+    return Array.from({ length: count }, () => this.generateHex());
+  }
 }
 
