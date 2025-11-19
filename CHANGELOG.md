@@ -84,6 +84,6 @@ useEffect(() => {
 ## [1.4.16] - 2025-09-26
 ### Added
 - Utils: sortByOnline и filterItems добавлено 2 метода
-## [1.4.17] - 2025-11-19
+## [1.4.18] - 2025-11-19
 ### Added
 - Color: generateHex generateHexMultiple
