@@ -18,6 +18,7 @@ export interface DateProcessingProps{
   hasDateLessPeriods(a:string, b: string, c:string, d?:{dateMinMax: '<=' | '>=' | '<' | '>'}):Record<'one' | 'two', boolean>
   getDi(a:string, b: string):number
   getDifferenceDates(a:string, b: string):number
+  calculateTimeDifference(a:string, b: string):Record<'days' | 'hours' | 'minutes' | 'seconds' | 'totalSeconds', number> & Record<'formatted' | 'formattedShort', string>
   hasDateLessInNumber(a:string, b: string, c:number):boolean
   correctionCurrentYear(a:[string], b?:number):string[]
   getChunkFromDate(a:string, b:'day' | 'month' | 'year', c?:{isBeforeZero:boolean}):string
