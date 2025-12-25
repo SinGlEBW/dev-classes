@@ -354,7 +354,6 @@ export class Color {
   private static readonly MIN_LIGHTNESS = 0.4;
 
   static isBrightAndVivid(color: string): boolean {
-    debugger
     const [r, g, b] = this.hexToRgb(color);
     const hsl = this.rgbToHsl(r, g, b);
     
