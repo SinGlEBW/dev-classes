@@ -405,7 +405,7 @@ export class Color {
     return Array.from({ length: count }, () => this.generateHex());
   };
   private static generatePastel(): string {
-    const [r, g, b] = this.generateRGB();
+    const [r, g, b] = Color.generateRGB();
 
     // Смешиваем с белым для пастельного эффекта
     const pastelR = Math.floor((r + 255) / 2);

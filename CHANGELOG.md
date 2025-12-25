@@ -99,4 +99,7 @@ useEffect(() => {
 ### Added
 - Color: increaseSaturation
 ### Change
-- Color: brightColor(factor)
+- Color: generate.brightColor(factor)
+## [1.4.33] - 2025-12-25
+### Fixed
+- Color: generate.pastelColor(factor)
