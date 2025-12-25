@@ -90,3 +90,8 @@ useEffect(() => {
 ## [1.4.22] - 2025-12-25
 ### Added
 - DateProcessingProps: calculateTimeDifference метод вычисляет разницу во времени
+## [1.4.30] - 2025-12-25
+### Added
+- Color: isBrightAndVivid
+### Change
+- Color: убраны generateHex generateHexMultiple добавлено свойство generate с методами rgb() hex() hexMultiple() pastelColor() neonColor() brightColor()

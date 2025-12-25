@@ -66,8 +66,15 @@ interface ColorProps{
   calculateOpacity(luminance: number, targetContrast: number): number;
   clamp(v: number, min: number, max: number): number;
   isHex(color:string):boolean;
-  generateHex():string;
-  generateHexMultiple(count:number):string[];
+  isBrightAndVivid: (color: string) => boolean;
+  generate: {
+    rgb: () => number[];
+    hex: () => string;
+    hexMultiple: () => string[];
+    pastelColor: () => string;
+    neonColor: () => string;
+    brightColor: () => string;
+  };
 }
 
 ```

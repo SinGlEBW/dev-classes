@@ -87,6 +87,30 @@ export class Color {
       a,
     };
   }
+    private static rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
+    r /= 255;
+    g /= 255;
+    b /= 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    let h = 0, s = 0; 
+    const l = (max + min) / 2;
+
+    if (max !== min) {
+      const d = max - min;
+      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+      
+      switch (max) {
+        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+        case g: h = (b - r) / d + 2; break;
+        case b: h = (r - g) / d + 4; break;
+      }
+      h /= 6;
+    }
+
+    return { h, s, l };
+  }
 
   // * https://stackoverflow.com/a/9493060/6758968
   /**
@@ -325,6 +349,18 @@ export class Color {
   static getTextColor: ColorProps['getTextColor'] = (luminance) => {
     return luminance > 0.5 ? [0, 0, 0] : [255, 255, 255];
   }
+  private static readonly MIN_BRIGHTNESS = 0.6;
+  private static readonly MIN_SATURATION = 0.5;
+  private static readonly MIN_LIGHTNESS = 0.4;
+
+  static isBrightAndVivid(color: string): boolean {
+    debugger
+    const [r, g, b] = this.hexToRgb(color);
+    const hsl = this.rgbToHsl(r, g, b);
+    
+    // Проверяем яркость и насыщенность
+    return hsl.l >= this.MIN_LIGHTNESS && hsl.s >= this.MIN_SATURATION;
+  }
 
   static calculateOpacity: ColorProps['calculateOpacity'] = (luminance, targetContrast) => {
     const targetTextLuminance = luminance > 0.5 ? 0 : 1;
@@ -341,13 +377,66 @@ export class Color {
     const hex = color.replace(/^#/, '');
     return /^[0-9A-Fa-f]{3}$|^[0-9A-Fa-f]{6}$|^[0-9A-Fa-f]{8}$/.test(hex);
   };
-  static generateHex:ColorProps['generateHex'] = () => {
+  private static generateHex = () => {
     const hex = Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
     return `#${hex}`;
   }
 
-  static generateHexMultiple:ColorProps['generateHexMultiple'] = (count) => {
+  private static generateHexMultiple = (count: number): string[] => {
     return Array.from({ length: count }, () => this.generateHex());
+  }
+  private static generatePastel(): string {
+    const [r, g, b] = this.generateRGB();
+    
+    // Смешиваем с белым для пастельного эффекта
+    const pastelR = Math.floor((r + 255) / 2);
+    const pastelG = Math.floor((g + 255) / 2);
+    const pastelB = Math.floor((b + 255) / 2);
+    
+    return `#${pastelR.toString(16).padStart(2, '0')}${pastelG.toString(16).padStart(2, '0')}${pastelB.toString(16).padStart(2, '0')}`;
+  }
+
+  private static generateNeon(): string {
+    const channels = [
+      Math.floor(Math.random() * 128 + 128), // Яркий канал
+      Math.floor(Math.random() * 64),        // Темный канал
+      Math.floor(Math.random() * 64)         // Темный канал
+    ];
+    
+    // Перемешиваем каналы
+    for (let i = channels.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [channels[i], channels[j]] = [channels[j], channels[i]];
+    }
+    
+    return `#${channels[0].toString(16).padStart(2, '0')}${channels[1].toString(16).padStart(2, '0')}${channels[2].toString(16).padStart(2, '0')}`;
+  }
+  private static generateRGB(): number[] {
+    return Array.from({ length: 3 }, () => Math.floor(Math.random() * 128 + 128));
+  }
+  private static brightColor(): string {
+    let attempts = 0;
+    let color: string;
+    
+    do {
+      const [r, g, b] = Color.generateRGB();
+      
+      color = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+      attempts++;
+      
+      // На всякий случай ограничим количество попыток
+      if (attempts > 100) break;
+    } while (!Color.isBrightAndVivid(color));
+    
+    return color;
+  }
+  static generate = {
+    rgb: this.generateRGB,
+    hex: this.generateHex,
+    hexMultiple: this.generateHexMultiple,
+    pastelColor: this.generatePastel,
+    neonColor: this.generateNeon,
+    brightColor: this.brightColor
   }
 }
 
