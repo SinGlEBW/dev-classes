@@ -87,6 +87,6 @@ useEffect(() => {
 ## [1.4.18] - 2025-11-19
 ### Added
 - Color: generateHex generateHexMultiple
-## [1.4.21] - 2025-12-24
+## [1.4.22] - 2025-12-25
 ### Added
 - DateProcessingProps: calculateTimeDifference метод вычисляет разницу во времени
