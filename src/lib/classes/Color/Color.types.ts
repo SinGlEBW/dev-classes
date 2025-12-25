@@ -36,6 +36,7 @@ export interface ColorProps {
   calculateBrightness(rgb: Color_P["ColorRgb"], type?: Color_P["TypeBrightness_OR"]): number;
   getTextColor(luminance: number): Color_P["ColorRgb"];
   calculateOpacity(luminance: number, targetContrast: number): number;
+  increaseSaturation: (color: string | number[], factor?: number) => string | number[];
   clamp(v: number, min: number, max: number): number;
 
   isBrightAndVivid: (color: string) => boolean;
@@ -45,7 +46,7 @@ export interface ColorProps {
     hexMultiple: () => string[];
     pastelColor: () => string;
     neonColor: () => string;
-    brightColor: () => string;
+    brightColor: (factor?: number) => string;
   };
  
 }

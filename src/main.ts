@@ -1,4 +1,7 @@
 //INFO: HTTPSApi Не верно возвращает данные при ошибке всего лишь 
+
+// import { Color } from '@lib';
+
 /*
 {
     "isReq": false,
@@ -6,7 +9,7 @@
     "keyAction": "login"
 }
 */
-
+// window.Color = Color
 
 // export const HTTPSApiRequest = <D = any>(payload: Parameters<typeof HTTPSApi["request"]>[0])=> {
 //   return new Promise<HTTPSApiRequestReturn<D>>(async (resolve, reject) => {

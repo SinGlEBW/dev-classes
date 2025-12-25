@@ -1,5 +1,4 @@
-import { ColorProps } from './Color.types';
-
+import { ColorProps } from "./Color.types";
 
 export class Color {
   /*Проверить свои методы и возможно исключить т.к. функционал возможно повторяется */
@@ -17,14 +16,14 @@ export class Color {
   //   return arrSTRNumber ? arrSTRNumber : [255, 255, 255];
   // };
 
-  static rgbToHex:ColorProps['rgbToHex'] = (r, g, b) => "#" + Color.componentToHex(r) + Color.componentToHex(g) + Color.componentToHex(b);
+  static rgbToHex: ColorProps["rgbToHex"] = (r, g, b) => "#" + Color.componentToHex(r) + Color.componentToHex(g) + Color.componentToHex(b);
 
   /**
    * https://stackoverflow.com/a/54070620/6758968
    * r, g, b in [0, 255]
    * @returns h in [0,360) and s, v in [0,1]
    */
-  static rgbToHsv: ColorProps['rgbToHsv'] = (r, g, b) => {
+  static rgbToHsv: ColorProps["rgbToHsv"] = (r, g, b) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     r /= 255;
     g /= 255;
@@ -33,7 +32,7 @@ export class Color {
       c = v - Math.min(r, g, b);
     const h = c && (v === r ? (g - b) / c : v == g ? 2 + (b - r) / c : 4 + (r - g) / c);
     return [60 * (h < 0 ? h + 6 : h), v && c / v, v];
-  }
+  };
 
   /**
    * https://stackoverflow.com/a/54024653/6758968
@@ -42,14 +41,14 @@ export class Color {
    * @param v [0, 1]
    * @returns r, g, b in [0, 255]
    */
-  static hsvToRgb: ColorProps['hsvToRgb'] = (h, s, v)  => {
+  static hsvToRgb: ColorProps["hsvToRgb"] = (h, s, v) => {
     const f = (n: number, k: number = (n + h / 60) % 6) => Math.round((v - v * s * Math.max(Math.min(k, 4 - k, 1), 0)) * 255);
     return [f(5), f(3), f(1)];
-  }
+  };
   /**
    * @returns h [0, 360], s [0, 100], l [0, 100], a [0, 1]
    */
-  static rgbaToHsla:ColorProps['rgbaToHsla'] = (r, g, b, a = 1) => {
+  static rgbaToHsla: ColorProps["rgbaToHsla"] = (r, g, b, a = 1) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     r /= 255;
     g /= 255;
@@ -86,25 +85,32 @@ export class Color {
       l: l * 100,
       a,
     };
-  }
-    private static rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
+  };
+  private static rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
     r /= 255;
     g /= 255;
     b /= 255;
 
     const max = Math.max(r, g, b);
     const min = Math.min(r, g, b);
-    let h = 0, s = 0; 
+    let h = 0,
+      s = 0;
     const l = (max + min) / 2;
 
     if (max !== min) {
       const d = max - min;
       s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-      
+
       switch (max) {
-        case r: h = (g - b) / d + (g < b ? 6 : 0); break;
-        case g: h = (b - r) / d + 2; break;
-        case b: h = (r - g) / d + 4; break;
+        case r:
+          h = (g - b) / d + (g < b ? 6 : 0);
+          break;
+        case g:
+          h = (b - r) / d + 2;
+          break;
+        case b:
+          h = (r - g) / d + 4;
+          break;
       }
       h /= 6;
     }
@@ -122,7 +128,7 @@ export class Color {
    * @param   {number}  l       The lightness [0, 1]
    * @return  {Array}           The RGB representation [0, 255]
    */
-  static hslaToRgba: ColorProps['hslaToRgba'] = (h, s, l, a) => {
+  static hslaToRgba: ColorProps["hslaToRgba"] = (h, s, l, a) => {
     // eslint-disable-next-line @typescript-eslint/no-unused-expressions
     h /= 360;
     s /= 100;
@@ -148,10 +154,10 @@ export class Color {
       b = hue2rgb(p, q, h - 1 / 3);
     }
 
-    return [r, g, b, a].map((v) => Math.round(v * 255)) as ReturnType<ColorProps['hslaToRgba']>;
-  }
+    return [r, g, b, a].map((v) => Math.round(v * 255)) as ReturnType<ColorProps["hslaToRgba"]>;
+  };
 
-  static hslaStringToRgba:ColorProps['hslaStringToRgba'] = (hsla: string) => {
+  static hslaStringToRgba: ColorProps["hslaStringToRgba"] = (hsla: string) => {
     const splitted = hsla.slice(5, -1).split(", ");
     const alpha = Number(splitted.pop());
     const arr = splitted.map((val) => {
@@ -163,9 +169,9 @@ export class Color {
     });
 
     return Color.hslaToRgba(arr[0], arr[1], arr[2], alpha);
-  }
+  };
 
-  static hexaToRgba: ColorProps['hexaToRgba'] = (hexa, isNormalizeAlpha) => {
+  static hexaToRgba: ColorProps["hexaToRgba"] = (hexa, isNormalizeAlpha) => {
     const arr = [] as any;
     const offset = hexa[0] === "#" ? 1 : 0;
     if (hexa.length === 5 + offset) {
@@ -187,43 +193,41 @@ export class Color {
         arr.push(parseInt(hexa.slice(i, i + 2), 16));
       }
     }
-    if(isNormalizeAlpha && arr.length === 4){
+    if (isNormalizeAlpha && arr.length === 4) {
       arr[3] = Math.round((arr[3] / 255) * 100) / 100;
     }
     return arr;
-  }
+  };
 
-
-  static hexaToHsla:ColorProps['hexaToHsla'] = (hexa) => {
+  static hexaToHsla: ColorProps["hexaToHsla"] = (hexa) => {
     const rgba = Color.hexaToRgba(hexa);
     return Color.rgbaToHsla(rgba[0], rgba[1], rgba[2], rgba[3]);
-  }
+  };
 
-  static hexToRgb:ColorProps['hexToRgb'] = (hex) => {
+  static hexToRgb: ColorProps["hexToRgb"] = (hex) => {
     const rgb = Color.hexaToRgba(hex.slice(0, 7)) as any;
-    return rgb as ReturnType<ColorProps['hexToRgb']>;
-  }
+    return rgb as ReturnType<ColorProps["hexToRgb"]>;
+  };
 
-
-  static rgbaToHexa:ColorProps['rgbaToHexa'] = (rgba) => {
+  static rgbaToHexa: ColorProps["rgbaToHexa"] = (rgba) => {
     const copyRgba = [...rgba];
     const alpha = copyRgba.pop();
     const alphaHex = Math.round(Math.min(Math.max(alpha ?? 1, 0), 1) * 255);
     return "#" + copyRgba.map((v) => ("0" + v.toString(16)).slice(-2)).join("") + alphaHex.toString(16);
-  }
+  };
 
-  static hslaStringToHexa:ColorProps['hslaStringToHexa'] = (hsla) => {
+  static hslaStringToHexa: ColorProps["hslaStringToHexa"] = (hsla) => {
     return Color.rgbaToHexa(Color.hslaStringToRgba(hsla));
-  }
+  };
 
-  static hslaStringToHex:ColorProps['hslaStringToHex'] = (hsla) => {
+  static hslaStringToHex: ColorProps["hslaStringToHex"] = (hsla) => {
     return Color.hslaStringToHexa(hsla).slice(0, -2);
-  }
+  };
 
   /**
    * @param weight [0, 1]
    */
-  static mixColors:ColorProps['mixColors'] = (color1, color2, weight) => {
+  static mixColors: ColorProps["mixColors"] = (color1, color2, weight) => {
     const out = new Array<number>(3) as any;
     for (let i = 0; i < 3; ++i) {
       const v1 = color1[i],
@@ -232,23 +236,22 @@ export class Color {
     }
 
     return out;
-  }
+  };
 
-  static getRgbByTypeBrightness: ColorProps['getRgbByTypeBrightness'] = (type) => {
+  static getRgbByTypeBrightness: ColorProps["getRgbByTypeBrightness"] = (type) => {
     const dataTypes = {
       BT601: [0.299, 0.587, 0.114],
       BT709: [0.2126, 0.7152, 0.0722],
       BT2020: [0.2627, 0.678, 0.0593],
     };
-    return dataTypes[type] as ReturnType<ColorProps['getRgbByTypeBrightness']>;
-  }
+    return dataTypes[type] as ReturnType<ColorProps["getRgbByTypeBrightness"]>;
+  };
 
+  static getAverageColor: ColorProps["getAverageColor"] = (color1, color2) => {
+    return color1.map((v, i) => Math.round((v + color2[i]) / 2)) as ReturnType<ColorProps["getAverageColor"]>;
+  };
 
-  static getAverageColor: ColorProps['getAverageColor'] = (color1, color2) => {
-    return color1.map((v, i) => Math.round((v + color2[i]) / 2)) as ReturnType<ColorProps['getAverageColor']>;
-  }
-
-  static getAccentColor:ColorProps['getAccentColor'] = (baseHsv, baseColor, elementColor) => {
+  static getAccentColor: ColorProps["getAccentColor"] = (baseHsv, baseColor, elementColor) => {
     const hsvTemp3 = Color.rgbToHsv(...baseColor);
     const hsvTemp4 = Color.rgbToHsv(...elementColor);
 
@@ -261,9 +264,9 @@ export class Color {
       return elementColor;
     }
     return Color.hsvToRgb(...hsvTemp3);
-  }
+  };
 
-  static changeColorAccent:ColorProps['changeColorAccent'] = (baseHsv, accentHsv, color, isDarkTheme) => {
+  static changeColorAccent: ColorProps["changeColorAccent"] = (baseHsv, accentHsv, color, isDarkTheme) => {
     const colorHsv = Color.rgbToHsv(...color);
 
     const diffH = Math.min(Math.abs(colorHsv[0] - baseHsv[0]), Math.abs(colorHsv[0] - baseHsv[0] - 360));
@@ -292,31 +295,31 @@ export class Color {
     }
 
     return newColor;
-  }
+  };
 
-  static changeBrightness: ColorProps['changeBrightness'] = (color, amount) => {
-    return color.map((v) => Color.clamp(Math.round(v * amount), 0, 255)) as ReturnType<ColorProps['changeBrightness']>;
-  }
+  static changeBrightness: ColorProps["changeBrightness"] = (color, amount) => {
+    return color.map((v) => Color.clamp(Math.round(v * amount), 0, 255)) as ReturnType<ColorProps["changeBrightness"]>;
+  };
 
-  static hexBrightness: ColorProps['hexBrightness'] = (hex, amount) => {
+  static hexBrightness: ColorProps["hexBrightness"] = (hex, amount) => {
     const rgb = Color.hexToRgb(hex);
     // const dataTypes = Color.getRgbByTypeBrightness(type);
-  
+
     const rgbBrightness = Color.changeBrightness(rgb, amount);
     const [r, g, b] = rgbBrightness;
     const hexBrightness = Color.rgbToHex(r, g, b);
 
     return hexBrightness;
-  }
+  };
 
-  static getHexColorFromTelegramColor: ColorProps['getHexColorFromTelegramColor'] = (color) => {
+  static getHexColorFromTelegramColor: ColorProps["getHexColorFromTelegramColor"] = (color) => {
     const hex = (color < 0 ? 0xffffff + color : color).toString(16);
     return "#" + (hex.length >= 6 ? hex : "0".repeat(6 - hex.length) + hex);
-  }
+  };
 
-  static getRgbColorFromTelegramColor: ColorProps['getRgbColorFromTelegramColor'] = (color) => {
+  static getRgbColorFromTelegramColor: ColorProps["getRgbColorFromTelegramColor"] = (color) => {
     return Color.hexToRgb(Color.getHexColorFromTelegramColor(color));
-  }
+  };
 
   // static getColorsFromWallPaper(wallPaper) {
   //   return wallPaper.settings
@@ -332,23 +335,23 @@ export class Color {
   //     : "";
   // }
 
-  static rgbaToRgb: ColorProps['rgbaToRgb'] = (rgba, bg) => {
+  static rgbaToRgb: ColorProps["rgbaToRgb"] = (rgba, bg) => {
     const a = rgba[3];
     return rgba.slice(0, 3).map((color, idx) => {
       return Color.clamp(Math.round((a * (color / 255) + a * (bg[idx] / 255)) * 255), 0, 255);
-    }) as ReturnType<ColorProps['rgbaToRgb']>;
-  }
+    }) as ReturnType<ColorProps["rgbaToRgb"]>;
+  };
 
-  static calculateBrightness: ColorProps['calculateBrightness'] = (rgb, type = 'BT709') => {
+  static calculateBrightness: ColorProps["calculateBrightness"] = (rgb, type = "BT709") => {
     const [r, g, b] = rgb;
     const dataTypes = Color.getRgbByTypeBrightness(type);
     const luminance = (dataTypes[0] * r) / 255 + (dataTypes[1] * g) / 255 + (dataTypes[2] * b) / 255;
     return luminance;
-  }
+  };
 
-  static getTextColor: ColorProps['getTextColor'] = (luminance) => {
+  static getTextColor: ColorProps["getTextColor"] = (luminance) => {
     return luminance > 0.5 ? [0, 0, 0] : [255, 255, 255];
-  }
+  };
   private static readonly MIN_BRIGHTNESS = 0.6;
   private static readonly MIN_SATURATION = 0.5;
   private static readonly MIN_LIGHTNESS = 0.4;
@@ -356,77 +359,95 @@ export class Color {
   static isBrightAndVivid(color: string): boolean {
     const [r, g, b] = this.hexToRgb(color);
     const hsl = this.rgbToHsl(r, g, b);
-    
+
     // Проверяем яркость и насыщенность
     return hsl.l >= this.MIN_LIGHTNESS && hsl.s >= this.MIN_SATURATION;
   }
 
-  static calculateOpacity: ColorProps['calculateOpacity'] = (luminance, targetContrast) => {
+  static calculateOpacity: ColorProps["calculateOpacity"] = (luminance, targetContrast) => {
     const targetTextLuminance = luminance > 0.5 ? 0 : 1;
     const adaptiveOpacity = (luminance - targetTextLuminance + targetContrast) / targetContrast;
     const opacity = +Math.max(0.5, Math.min(0.64, adaptiveOpacity)).toFixed(2);
     return opacity;
-  }
-
-  static clamp: ColorProps['clamp'] = (v, min, max) => {
+  };
+  static increaseSaturation: ColorProps["increaseSaturation"] = (color, factor = 1.3) => {
+    // 1. Определяем формат входного цвета
+    if (typeof color === "string") {
+      // HEX формат
+      const rgb = Color.hexToRgb(color);
+      const [h, s, v] = Color.rgbToHsv(...rgb);
+      const newS = Math.min(1, s * factor);
+      const newRgb = Color.hsvToRgb(h, newS, v);
+      return Color.rgbToHex(...newRgb);
+    } else {
+      // RGB формат
+      const [h, s, v] = Color.rgbToHsv(color[0], color[1], color[2]);
+      const newS = Math.min(1, s * factor);
+      return Color.hsvToRgb(h, newS, v);
+    }
+  };
+  static clamp: ColorProps["clamp"] = (v, min, max) => {
     return Math.min(max, Math.max(min, v));
   };
   static isHex = (color: string) => {
-    if (typeof color !== 'string') return false;
-    const hex = color.replace(/^#/, '');
+    if (typeof color !== "string") return false;
+    const hex = color.replace(/^#/, "");
     return /^[0-9A-Fa-f]{3}$|^[0-9A-Fa-f]{6}$|^[0-9A-Fa-f]{8}$/.test(hex);
   };
   private static generateHex = () => {
-    const hex = Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
+    const hex = Math.floor(Math.random() * 0xffffff)
+      .toString(16)
+      .padStart(6, "0");
     return `#${hex}`;
-  }
+  };
 
   private static generateHexMultiple = (count: number): string[] => {
     return Array.from({ length: count }, () => this.generateHex());
-  }
+  };
   private static generatePastel(): string {
     const [r, g, b] = this.generateRGB();
-    
+
     // Смешиваем с белым для пастельного эффекта
     const pastelR = Math.floor((r + 255) / 2);
     const pastelG = Math.floor((g + 255) / 2);
     const pastelB = Math.floor((b + 255) / 2);
-    
-    return `#${pastelR.toString(16).padStart(2, '0')}${pastelG.toString(16).padStart(2, '0')}${pastelB.toString(16).padStart(2, '0')}`;
+
+    return `#${pastelR.toString(16).padStart(2, "0")}${pastelG.toString(16).padStart(2, "0")}${pastelB.toString(16).padStart(2, "0")}`;
   }
 
   private static generateNeon(): string {
     const channels = [
       Math.floor(Math.random() * 128 + 128), // Яркий канал
-      Math.floor(Math.random() * 64),        // Темный канал
-      Math.floor(Math.random() * 64)         // Темный канал
+      Math.floor(Math.random() * 64), // Темный канал
+      Math.floor(Math.random() * 64), // Темный канал
     ];
-    
+
     // Перемешиваем каналы
     for (let i = channels.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [channels[i], channels[j]] = [channels[j], channels[i]];
     }
-    
-    return `#${channels[0].toString(16).padStart(2, '0')}${channels[1].toString(16).padStart(2, '0')}${channels[2].toString(16).padStart(2, '0')}`;
+
+    return `#${channels[0].toString(16).padStart(2, "0")}${channels[1].toString(16).padStart(2, "0")}${channels[2].toString(16).padStart(2, "0")}`;
   }
   private static generateRGB(): number[] {
     return Array.from({ length: 3 }, () => Math.floor(Math.random() * 128 + 128));
   }
-  private static brightColor(): string {
+  private static brightColor(factor: number = 1.3): string {
     let attempts = 0;
     let color: string;
-    
+
     do {
       const [r, g, b] = Color.generateRGB();
-      
-      color = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+
+      color = `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+      color = Color.increaseSaturation(color, factor) as string;
       attempts++;
-      
+
       // На всякий случай ограничим количество попыток
       if (attempts > 100) break;
     } while (!Color.isBrightAndVivid(color));
-    
+
     return color;
   }
   static generate = {
@@ -435,7 +456,6 @@ export class Color {
     hexMultiple: this.generateHexMultiple,
     pastelColor: this.generatePastel,
     neonColor: this.generateNeon,
-    brightColor: this.brightColor
-  }
+    brightColor: this.brightColor,
+  };
 }
-

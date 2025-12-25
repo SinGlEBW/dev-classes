@@ -95,3 +95,8 @@ useEffect(() => {
 - Color: isBrightAndVivid
 ### Change
 - Color: убраны generateHex generateHexMultiple добавлено свойство generate с методами rgb() hex() hexMultiple() pastelColor() neonColor() brightColor()
+## [1.4.32] - 2025-12-25
+### Added
+- Color: increaseSaturation
+### Change
+- Color: brightColor(factor)

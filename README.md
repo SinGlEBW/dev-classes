@@ -67,13 +67,14 @@ interface ColorProps{
   clamp(v: number, min: number, max: number): number;
   isHex(color:string):boolean;
   isBrightAndVivid: (color: string) => boolean;
+  increaseSaturation: (color: string | number[], factor?: number) => string | number[];
   generate: {
     rgb: () => number[];
     hex: () => string;
     hexMultiple: () => string[];
     pastelColor: () => string;
     neonColor: () => string;
-    brightColor: () => string;
+    brightColor: (factor?: number) => string;
   };
 }
 
