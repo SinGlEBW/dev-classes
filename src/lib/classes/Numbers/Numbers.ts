@@ -16,4 +16,9 @@ export class Numbers {
     const date = new Date();
     return Math.floor(Math.random() * date.getTime())
   }
+
+  static randomMinMax = (min: number, max: number) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
 }
+

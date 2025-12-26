@@ -108,3 +108,6 @@ useEffect(() => {
 - Color: rgbToHsl т.к. есть rgbaToHsla
 ### Change
 - Color: generate.pastelColor
+## [1.4.37] - 2025-12-26
+### Addded
+- Numbers: randomMinMax
