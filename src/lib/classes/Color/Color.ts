@@ -1,4 +1,4 @@
-import { ColorProps } from "./Color.types";
+import { ColorProps, type ColorRgb } from "./Color.types";
 
 export class Color {
   /*Проверить свои методы и возможно исключить т.к. функционал возможно повторяется */
@@ -357,7 +357,7 @@ export class Color {
     return Array.from({ length: count }, () => this.generateHex());
   };
 
-  private static generateNeon(): string {
+  private static generateNeon:ColorProps['generate']['neonColor'] = () => {
     const channels = [
       Math.floor(Math.random() * 128 + 128), // Яркий канал
       Math.floor(Math.random() * 64), // Темный канал
@@ -372,8 +372,8 @@ export class Color {
 
     return `#${channels[0].toString(16).padStart(2, "0")}${channels[1].toString(16).padStart(2, "0")}${channels[2].toString(16).padStart(2, "0")}`;
   }
-  private static generateRGB(): number[] {
-    return Array.from({ length: 3 }, () => Math.floor(Math.random() * 128 + 128));
+  private static generateRGB = ():ColorRgb => {
+    return Array.from({ length: 3 }, () => Math.floor(Math.random() * 128 + 128)) as ColorRgb;
   }
   private static brightColor(factor: number = 1.3): string {
     let attempts = 0;
@@ -392,20 +392,14 @@ export class Color {
 
     return color;
   }
-  static hslToHex(hue: number, saturation: number, lightness: number): string {
+  static hslToHex = (hue: number, saturation: number, lightness: number): string => {
     const rgba = Color.hslaToRgba(hue, saturation, lightness, 1);
     const [r, g, b] = rgba.slice(0, 3);
     return Color.rgbToHex(r, g, b);
   }
-  private static generatePleasantColor(
-    options: {
-      baseColor?: string;
-      saturation?: number;
-      lightness?: number;
-      hueShift?: number;
-      randomize?: boolean;
-    } = {}
-  ): string {
+  private static generatePleasantColor:ColorProps['generate']['pastelColor'] = (
+    options = {}
+  ) => {
     const { baseColor, saturation = 50, lightness = 50, hueShift = 0, randomize = false } = options;
 
     let hue: number;
