@@ -375,7 +375,7 @@ export class Color {
   private static generateRGB = ():ColorRgb => {
     return Array.from({ length: 3 }, () => Math.floor(Math.random() * 128 + 128)) as ColorRgb;
   }
-  private static brightColor(factor: number = 1.3): string {
+  private static brightColor = (factor: number = 1.3): string =>  {
     let attempts = 0;
     let color: string;
 
