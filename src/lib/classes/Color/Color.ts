@@ -3,23 +3,21 @@ import { ColorProps } from "./Color.types";
 export class Color {
   /*Проверить свои методы и возможно исключить т.к. функционал возможно повторяется */
   private static componentToHex = (c: number) => {
-    const hex = c.toString(16);
+    const clamped = Math.max(0, Math.min(255, Math.round(c)));
+    const hex = clamped.toString(16);
     return hex.length == 1 ? "0" + hex : hex;
   };
 
-  // static getNumberRGB = (getComputedStyleRGB) => {
-  //   const arrSTRNumber = getComputedStyleRGB.match(/\d+/gi);
-  //   if (arrSTRNumber?.length) {
-  //     return arrSTRNumber.map((i) => Number(i));
-  //   }
-
-  //   return arrSTRNumber ? arrSTRNumber : [255, 255, 255];
-  // };
-
   static rgbToHex: ColorProps["rgbToHex"] = (r, g, b) => "#" + Color.componentToHex(r) + Color.componentToHex(g) + Color.componentToHex(b);
+  // static rgbToHex: ColorProps["rgbToHex"] = (r: number, g: number, b: number) => {
+  //   const toHex = (n: number): string => {
+  //     const hex = Math.round(n).toString(16);
+  //     return hex.length === 1 ? "0" + hex : hex;
+  //   };
 
+  //   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  // }
   /**
-   * https://stackoverflow.com/a/54070620/6758968
    * r, g, b in [0, 255]
    * @returns h in [0,360) and s, v in [0,1]
    */
@@ -35,7 +33,6 @@ export class Color {
   };
 
   /**
-   * https://stackoverflow.com/a/54024653/6758968
    * @param h [0, 360]
    * @param s [0, 1]
    * @param v [0, 1]
@@ -53,8 +50,8 @@ export class Color {
     r /= 255;
     g /= 255;
     b /= 255;
-    const max = Math.max(r, g, b),
-      min = Math.min(r, g, b);
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
     let h: number = 0,
       s: number;
     const l = (max + min) / 2;
@@ -86,39 +83,8 @@ export class Color {
       a,
     };
   };
-  private static rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
-    r /= 255;
-    g /= 255;
-    b /= 255;
 
-    const max = Math.max(r, g, b);
-    const min = Math.min(r, g, b);
-    let h = 0,
-      s = 0;
-    const l = (max + min) / 2;
 
-    if (max !== min) {
-      const d = max - min;
-      s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-
-      switch (max) {
-        case r:
-          h = (g - b) / d + (g < b ? 6 : 0);
-          break;
-        case g:
-          h = (b - r) / d + 2;
-          break;
-        case b:
-          h = (r - g) / d + 4;
-          break;
-      }
-      h /= 6;
-    }
-
-    return { h, s, l };
-  }
-
-  // * https://stackoverflow.com/a/9493060/6758968
   /**
    * Converts an HSL color value to RGB. Conversion formula
    * adapted from http://en.wikipedia.org/wiki/HSL_color_space.
@@ -321,19 +287,6 @@ export class Color {
     return Color.hexToRgb(Color.getHexColorFromTelegramColor(color));
   };
 
-  // static getColorsFromWallPaper(wallPaper) {
-  //   return wallPaper.settings
-  //     ? [
-  //         wallPaper.settings.background_color,
-  //         wallPaper.settings.second_background_color,
-  //         wallPaper.settings.third_background_color,
-  //         wallPaper.settings.fourth_background_color,
-  //       ]
-  //         .filter(Boolean)
-  //         .map(Color.getHexColorFromTelegramColor)
-  //         .join(",")
-  //     : "";
-  // }
 
   static rgbaToRgb: ColorProps["rgbaToRgb"] = (rgba, bg) => {
     const a = rgba[3];
@@ -352,13 +305,12 @@ export class Color {
   static getTextColor: ColorProps["getTextColor"] = (luminance) => {
     return luminance > 0.5 ? [0, 0, 0] : [255, 255, 255];
   };
-  private static readonly MIN_BRIGHTNESS = 0.6;
-  private static readonly MIN_SATURATION = 0.5;
-  private static readonly MIN_LIGHTNESS = 0.4;
+  private static readonly MIN_SATURATION = 50;
+  private static readonly MIN_LIGHTNESS = 44;
 
   static isBrightAndVivid(color: string): boolean {
     const [r, g, b] = this.hexToRgb(color);
-    const hsl = this.rgbToHsl(r, g, b);
+    const hsl = this.rgbaToHsla(r, g, b, 1);
 
     // Проверяем яркость и насыщенность
     return hsl.l >= this.MIN_LIGHTNESS && hsl.s >= this.MIN_SATURATION;
@@ -404,16 +356,6 @@ export class Color {
   private static generateHexMultiple = (count: number): string[] => {
     return Array.from({ length: count }, () => this.generateHex());
   };
-  private static generatePastel(): string {
-    const [r, g, b] = Color.generateRGB();
-
-    // Смешиваем с белым для пастельного эффекта
-    const pastelR = Math.floor((r + 255) / 2);
-    const pastelG = Math.floor((g + 255) / 2);
-    const pastelB = Math.floor((b + 255) / 2);
-
-    return `#${pastelR.toString(16).padStart(2, "0")}${pastelG.toString(16).padStart(2, "0")}${pastelB.toString(16).padStart(2, "0")}`;
-  }
 
   private static generateNeon(): string {
     const channels = [
@@ -450,11 +392,69 @@ export class Color {
 
     return color;
   }
+  static hslToHex(hue: number, saturation: number, lightness: number): string {
+    const rgba = Color.hslaToRgba(hue, saturation, lightness, 1);
+    const [r, g, b] = rgba.slice(0, 3);
+    return Color.rgbToHex(r, g, b);
+  }
+  private static generatePleasantColor(
+    options: {
+      baseColor?: string;
+      saturation?: number;
+      lightness?: number;
+      hueShift?: number;
+      randomize?: boolean;
+    } = {}
+  ): string {
+    const { baseColor, saturation = 50, lightness = 50, hueShift = 0, randomize = false } = options;
+
+    let hue: number;
+    let finalSaturation: number;
+    let finalLightness: number;
+
+    if (baseColor) {
+      const hsla = Color.hexaToHsla(baseColor);
+      hue = (hsla.h + hueShift) % 360;
+
+      if (randomize) {
+        finalSaturation = Math.max(30, Math.min(90, saturation + (Math.random() * 40 - 20)));
+        finalLightness = Math.max(40, Math.min(80, lightness + (Math.random() * 30 - 15)));
+      } else {
+        finalSaturation = saturation;
+        finalLightness = lightness;
+      }
+    } else {
+      hue = Math.floor(Math.random() * 360);
+      finalSaturation = saturation + Math.random() * 20;
+      finalLightness = lightness + Math.random() * 20;
+    }
+
+    // Исключаем грязные оттенки
+    if ((hue >= 20 && hue <= 50) || (hue >= 60 && hue <= 140)) {
+      hue = (hue + 100) % 360;
+    }
+
+    if (lightness < 100) {
+      finalSaturation = Math.max(finalSaturation, 15);
+
+      if (finalLightness > 95) {
+        finalLightness = 95 - Math.random() * 10; // 85-95
+      }
+
+      if (finalSaturation < 20 && finalLightness > 90) {
+        hue = (hue + 180) % 360; // Резкий сдвиг оттенка
+        finalSaturation = Math.max(25, finalSaturation);
+      }
+    }
+
+    return Color.hslToHex(hue, finalSaturation, finalLightness);
+  }
+
   static generate = {
     rgb: this.generateRGB,
     hex: this.generateHex,
     hexMultiple: this.generateHexMultiple,
-    pastelColor: this.generatePastel,
+    pastelColor: this.generatePleasantColor,
     neonColor: this.generateNeon,
     brightColor: this.brightColor,
   };

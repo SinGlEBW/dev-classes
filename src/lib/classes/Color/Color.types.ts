@@ -44,7 +44,13 @@ export interface ColorProps {
     rgb: () => number[];
     hex: () => string;
     hexMultiple: () => string[];
-    pastelColor: () => string;
+    pastelColor: (config: {      
+      baseColor?: string;
+      saturation?: number;
+      lightness?: number;
+      hueShift?: number;
+      randomize?: boolean;
+    }) => string;
     neonColor: () => string;
     brightColor: (factor?: number) => string;
   };

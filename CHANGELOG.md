@@ -103,3 +103,8 @@ useEffect(() => {
 ## [1.4.33] - 2025-12-25
 ### Fixed
 - Color: generate.pastelColor(factor)
+## [1.4.34] - 2025-12-25
+### Remove
+- Color: rgbToHsl т.к. есть rgbaToHsla
+### Change
+- Color: generate.pastelColor
