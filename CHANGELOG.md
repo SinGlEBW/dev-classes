@@ -114,3 +114,6 @@ useEffect(() => {
 ## [1.4.38] - 2026-02-03
 ### Change
 - NetworkStatusTracker: getTypeNetwork. Изменён метод т.к. на Safari нету window.navigator.connection;
+## [1.4.39] - 2026-02-03
+### Change
+- NetworkStatusTracker: Экспорт типов;
