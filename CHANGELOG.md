@@ -117,3 +117,10 @@ useEffect(() => {
 ## [1.4.39] - 2026-02-03
 ### Change
 - NetworkStatusTracker: Экспорт типов;
+
+## [1.5.01] - 2026-02-18
+### Added
+- Добавлены классы: Timer, BrowserUtils;
+### Change
+- startEvents в NetworkStatusTracker теперь можно дождаться с await
+

@@ -15,13 +15,145 @@ HTTPSApi.request({keyAction: 'action1', request: {url: '...'}})
 <h3 align="center">NetworkInformation</h3>
 
 ```ts
-import { NetworkInformation, NetworkInformationCordova, NetworkInformationPC } from 'dev-classes';
+import { NetworkInformation, NetworkInformationCordova, NetworkInformationPC, NetworkStatusTracker  } from 'dev-classes';
 
 const internet = new NetworkInformation([new NetworkInformationPC(), new NetworkInformationCordova()]);
 
 internet.run((status, textStatus) => {
   status ? online() : offline();
 });
+
+// или
+const listUrl = ['https://www.google.com'];// для проверки можно опираться на адреса иначе используеться listeners online/ofline или change
+const networkTicker = new NetworkStatusTracker(listUrl);//или []
+
+await networkTicker.startEvents((info) => {
+  console.dir(info);
+  console.dir('А');
+});
+
+console.dir('Б');
+
+//Продолжаем инициализацию приложения после установки иментов
+
+```
+<h3 align="center">Timer</h3>
+
+```ts
+import { Timer } from 'dev-classes';
+
+//Рабочий hook
+
+interface UseShowPanelProps {
+  timeoutShowPanel?: number;
+}
+
+interface UseShowPanelState {
+  showPanel: boolean;
+}
+
+export const useShowPanel = (props: UseShowPanelProps = { timeoutShowPanel: 5000 }) => {
+  const [state, setState] = useState<UseShowPanelState>({
+    showPanel: true,
+  });
+  const setStateHelpers = setStateDecorator(state, setState);
+
+  const timerRef = useRef<Timer | null>(null);
+
+  // Инициализация таймера
+  useEffect(() => {
+    timerRef.current = new Timer(props.timeoutShowPanel, () => {
+      console.log("Время истекло, скрываем панель");
+      setStateHelpers({ showPanel: false });
+    });
+
+    timerRef.current.startTime();
+    return () => {
+      if (timerRef.current) {
+        timerRef.current.resetTime();
+      }
+    };
+  }, [props.timeoutShowPanel]);
+
+  // Показать панель и запустить таймер
+  const handleShowPanel = useCallback(() => {
+    if (!state.showPanel) {
+      setStateHelpers({ showPanel: true });
+      
+      // Важно: сбрасываем и запускаем таймер заново
+      if (timerRef.current) {
+        timerRef.current.resetTime();
+        timerRef.current.startTime();
+      }
+    }
+  }, [state.showPanel]);
+
+  // Сбросить время (продлить показ панели)
+  const handleResetTimePanel = useCallback(() => {
+    if (timerRef.current && state.showPanel) {
+      timerRef.current.resetTime();
+      timerRef.current.startTime();
+    }
+  }, [state.showPanel]);
+
+  // Поставить на паузу (например, при открытии select)
+  const handlePauseTimer = useCallback(() => {
+    if (timerRef.current && state.showPanel) {
+      timerRef.current.pauseTime();
+    }
+  }, [state.showPanel]);
+
+  // Возобновить таймер (например, при закрытии select)
+  const handleResumeTimer = useCallback(() => {
+    if (timerRef.current && state.showPanel) {
+      timerRef.current.startTime();
+    }
+  }, [state.showPanel]);
+
+  // Скрыть панель принудительно
+  const handleHidePanel = useCallback(() => {
+    setStateHelpers({ showPanel: false });
+    if (timerRef.current) {
+      timerRef.current.resetTime();
+    }
+  }, []);
+
+  return {
+    showPanel: state.showPanel,
+    handleShowPanel,
+    handleResetTimePanel,
+    handlePauseTimer,
+    handleResumeTimer,
+    handleHidePanel,
+  };
+};
+
+
+//Где-то
+const { showPanel, handleShowPanel, handleResetTimePanel, handlePauseTimer, handleResumeTimer } = useShowPanel({ timeoutShowPanel: 8000 });
+
+    <ContentPage onClick={() => {
+      handleResetTimePanel();
+      handleShowPanel();
+    }}
+    >
+    //...
+    //При открытии на панели окон и селекторов можно остановить таймер скрытия 
+    //handlePauseTimer, handleResumeTimer
+    </ContentPage>
+
+
+```
+<h3 align="center">BrowserUtils</h3>
+
+```ts
+import { BrowserUtils, BrowserPlatforms_OR } from 'dev-classes';
+
+BrowserUtils.initEventsPauseResume((statusString) => {
+  console.log(statusString)// => on/off
+})
+//Универсальный метод для браузеров и webKit. Ориентируеться на userAgent
+const platform:BrowserPlatforms_OR = BrowserUtils.getWebPlatform();
 
 ```
 <h3 align="center">Color</h3>

@@ -1,4 +1,7 @@
-export interface NetworkInfoConnection {
+
+
+
+export interface NetworkInfoConnection extends EventTarget{
   downlink?: number;
   effectiveType?: string;
   rtt?: number;
@@ -21,7 +24,7 @@ export type OnStatusChange = (info: NetworkStatusInfoTracker) => void;
 
 
 
- export interface NetworkItemListTracker {
+export interface NetworkItemListTracker {
   keyNameSystem: string, 
   getInfo: () => NetworkStatusInfoTracker
 } 

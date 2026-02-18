@@ -1,5 +1,25 @@
 //INFO: HTTPSApi Не верно возвращает данные при ошибке всего лишь
 
+// import { NetworkStatusTracker } from "@lib";
+
+// const networkTicker = new NetworkStatusTracker(['https://tmk.imis.ru/client/']);
+// await networkTicker.startEvents((info) => {
+//   console.dir(info);
+// })
+// console.dir(2);
+
+// const internet = new NetworkInformation([new NetworkInformationPC(), new NetworkInformationCordova()]);
+
+// internet.run((status, textStatus) => {
+//   console.dir(textStatus);
+//   status ? console.dir("online") : console.dir("offline");
+// });
+
+// const networkTicker = new NetworkStatusTracker([]);
+// const status = await networkTicker.startEvents((info) => {
+//   console.dir(info);
+// });
+
 // import { Color } from "@lib";
 
 // import { Color } from '@lib';
