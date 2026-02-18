@@ -123,4 +123,7 @@ useEffect(() => {
 - Добавлены классы: Timer, BrowserUtils;
 ### Change
 - startEvents в NetworkStatusTracker теперь можно дождаться с await
+## [1.5.2] - 2026-02-18
+### Change
+- Вернул тип NetworkStatusInfoTracker
 
