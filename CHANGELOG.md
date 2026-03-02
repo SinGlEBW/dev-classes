@@ -126,4 +126,8 @@ useEffect(() => {
 ## [1.5.3] - 2026-03-02
 ### Change
 - NetworkStatusTracker. Если есть передан listUrls, то тип connection.addEventListener('change') реагирует на listUrls
+## [1.5.4] - 2026-03-02
+### Change
+- NetworkStatusTracker. Вернул события "online" | "offline" в не зависимости от существования connection.addEventListener('change')
+
 

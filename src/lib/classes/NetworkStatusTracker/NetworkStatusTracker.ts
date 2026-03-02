@@ -76,7 +76,6 @@ export class NetworkStatusTracker {
     this.configInit = config;
     if (this.state.isInitialized) return;
     try {
-   
       if (this.listUrls.length > 0) {
         await this.requestByUrls(onStatusChange, config);
       } else {
@@ -110,13 +109,29 @@ export class NetworkStatusTracker {
         };
         this.setControllersEvents(controllers);
 
-        const connection = this.getConnection();
+        
+        window.addEventListener(
+          "online",
+          () => {
+            this.updateState(true, onStatusChange);
+          },
+          { signal: controllers.online?.signal },
+        );
 
+        window.addEventListener(
+          "offline",
+          () => {
+            this.updateState(false, onStatusChange);
+          },
+          { signal: controllers.offline?.signal },
+        );
+
+
+        const connection = this.getConnection();
         if (connection && connection?.addEventListener) {
           connection.addEventListener(
             "change",
             async (e) => {
-              
               if (this.listUrls.length > 0) {
                 await this.requestByUrls(onStatusChange, this.configInit);
               } else {
@@ -125,22 +140,6 @@ export class NetworkStatusTracker {
               }
             },
             { signal: controllers.change?.signal },
-          );
-        } else {
-          window.addEventListener(
-            "online",
-            () => {
-              this.updateState(true, onStatusChange);
-            },
-            { signal: controllers.online?.signal },
-          );
-
-          window.addEventListener(
-            "offline",
-            () => {
-              this.updateState(false, onStatusChange);
-            },
-            { signal: controllers.offline?.signal },
           );
         }
 
