@@ -129,5 +129,8 @@ useEffect(() => {
 ## [1.5.4] - 2026-03-02
 ### Change
 - NetworkStatusTracker. Вернул события "online" | "offline" в не зависимости от существования connection.addEventListener('change')
+## [1.5.5] - 2026-03-02
+### Change
+- NetworkStatusTracker. Теперь если есть connection.addEventListener('change'), то "online" | "offline" не будут использоваться что бы не дублировать срабатывание событий
 
 

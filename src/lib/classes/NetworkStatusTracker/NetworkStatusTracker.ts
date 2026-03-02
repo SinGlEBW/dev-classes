@@ -109,24 +109,6 @@ export class NetworkStatusTracker {
         };
         this.setControllersEvents(controllers);
 
-        
-        window.addEventListener(
-          "online",
-          () => {
-            this.updateState(true, onStatusChange);
-          },
-          { signal: controllers.online?.signal },
-        );
-
-        window.addEventListener(
-          "offline",
-          () => {
-            this.updateState(false, onStatusChange);
-          },
-          { signal: controllers.offline?.signal },
-        );
-
-
         const connection = this.getConnection();
         if (connection && connection?.addEventListener) {
           connection.addEventListener(
@@ -140,6 +122,22 @@ export class NetworkStatusTracker {
               }
             },
             { signal: controllers.change?.signal },
+          );
+        } else {
+          window.addEventListener(
+            "online",
+            () => {
+              this.updateState(true, onStatusChange);
+            },
+            { signal: controllers.online?.signal },
+          );
+
+          window.addEventListener(
+            "offline",
+            () => {
+              this.updateState(false, onStatusChange);
+            },
+            { signal: controllers.offline?.signal },
           );
         }
 
