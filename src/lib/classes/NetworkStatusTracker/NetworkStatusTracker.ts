@@ -9,7 +9,7 @@ import type {
 
 export class NetworkStatusTracker {
   private networkInfo: NetworkStatusInfoTracker;
-
+  private configInit?: NetworkConstructorConfig;
   private listUrls: string[] = [];
   private state = {
     isActiveEvents: false,
@@ -73,16 +73,14 @@ export class NetworkStatusTracker {
   }
 
   private async initialize(onStatusChange?: OnStatusChange, config?: NetworkConstructorConfig): Promise<void> {
+    this.configInit = config;
     if (this.state.isInitialized) return;
     try {
-      // Сначала проверяем через события браузера/Cordova
-      const initialOnline = typeof navigator !== "undefined" ? navigator.onLine : false;
-
-      // Если есть URL для проверки, делаем реальный запрос
+   
       if (this.listUrls.length > 0) {
         await this.requestByUrls(onStatusChange, config);
       } else {
-        // Если нет URL, используем информацию из браузера
+        const initialOnline = typeof navigator !== "undefined" ? navigator.onLine : false;
         this.updateState(initialOnline, onStatusChange);
       }
 
@@ -117,10 +115,14 @@ export class NetworkStatusTracker {
         if (connection && connection?.addEventListener) {
           connection.addEventListener(
             "change",
-            (e) => {
-              console.log("NetworkStatusTracker: connection change event");
-              const isNetwork = navigator.onLine;
-              this.updateState(isNetwork, onStatusChange);
+            async (e) => {
+              
+              if (this.listUrls.length > 0) {
+                await this.requestByUrls(onStatusChange, this.configInit);
+              } else {
+                const isNetwork = navigator.onLine;
+                this.updateState(isNetwork, onStatusChange);
+              }
             },
             { signal: controllers.change?.signal },
           );
