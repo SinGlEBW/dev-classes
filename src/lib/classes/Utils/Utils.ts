@@ -102,8 +102,8 @@ export class Utils {
     }
     return true;
   };
-  static filterItems = <T extends Array<{ [key in string]: any } & { name: string }>>(list: T, searchQuery: string):T=>
-    list.filter((contact) => contact.name.toLowerCase().includes(searchQuery.toLowerCase())) as T;
+  static filterItems = <T extends Array<{ [key in string]: any } & { name: string }>>(list: T, searchQuery: string, config?: { filteKey?: string }):T =>
+    list.filter((contact) => contact[config?.filteKey || "name"].toLowerCase().includes(searchQuery.toLowerCase())) as T;
 
   static sortByOnline = <T extends Array<{[key in string]: any} & {name: string, online:boolean}>>(list: T):T => {
     const listOnline: (typeof list)[number][] = [];
