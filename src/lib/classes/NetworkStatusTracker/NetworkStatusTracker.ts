@@ -52,10 +52,10 @@ export class NetworkStatusTracker {
       typeNetwork: this.getTypeNetwork(isOnlineFetch),
     };
 
-    this.networkInfo = info;
-    if (typeof onStatusChange === "function") {
+    if (typeof onStatusChange === "function" && this.networkInfo.typeNetwork !== info.typeNetwork) {
       onStatusChange(info);
     }
+    this.networkInfo = info;
   }
 
   /*-----------------------------------------------------------------------------*/

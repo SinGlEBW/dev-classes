@@ -132,5 +132,8 @@ useEffect(() => {
 ## [1.5.5] - 2026-03-02
 ### Change
 - NetworkStatusTracker. Теперь если есть connection.addEventListener('change'), то "online" | "offline" не будут использоваться что бы не дублировать срабатывание событий
+## [1.5.6] - 2026-04-03
+### Fixed
+- NetworkStatusTracker. addEventListener('change') Если typeNetwork отрабатывает с тем же типом то onStatusChange не будет вызываться
 
 
