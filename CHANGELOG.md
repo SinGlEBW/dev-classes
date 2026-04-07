@@ -135,5 +135,8 @@ useEffect(() => {
 ## [1.5.7] - 2026-04-03
 ### Fixed
 - NetworkStatusTracker. addEventListener('change') Если typeNetwork отрабатывает с тем же типом то onStatusChange не будет вызываться
+## [1.5.8] - 2026-04-07
+### Added
+- Timer. resumeTime
 
 

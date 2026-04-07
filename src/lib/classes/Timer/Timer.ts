@@ -22,17 +22,42 @@ export class Timer {
   }
 
   /**
-   * Запускает или возобновляет таймер
+   * Запускает таймер
    */
   startTime() {
-    if (this.timerId !== null || this.isPaused) {
-      return; // Таймер уже запущен или на паузе
+    if (this.timerId !== null) {
+      return; // Таймер уже запущен
+    }
+
+    if (this.isPaused) {
+      // Если на паузе, лучше использовать resumeTime()
+      return;
     }
 
     this.startTimeCount = Date.now();
     this.timerId = setTimeout(() => {
       this.complete();
     }, this.remainingTime);
+  }
+
+  /**
+   * Возобновляет таймер после паузы
+   */
+  resumeTime(): void {
+    if (this.timerId !== null) {
+      return; // Таймер уже запущен
+    }
+
+    if (!this.isPaused) {
+      return; // Таймер не на паузе
+    }
+
+    // Возобновляем с оставшимся временем
+    this.startTimeCount = Date.now();
+    this.timerId = setTimeout(() => {
+      this.complete();
+    }, this.remainingTime);
+    this.isPaused = false;
   }
 
   /**
