@@ -138,5 +138,8 @@ useEffect(() => {
 ## [1.5.8] - 2026-04-07
 ### Added
 - Timer. resumeTime
+## [1.5.9] - 2026-04-14
+### Added
+- Расширил EventSubscribers
 
 

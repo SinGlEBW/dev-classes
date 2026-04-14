@@ -13,7 +13,7 @@ export class HTTPSApi{
 
   private static internet = new NetworkInformation([new NetworkInformationPC(), new NetworkInformationCordova()]);
   private static events = new EventSubscribers<HTTPSApi_Events>(["fetch"]);
-
+  
   private static setState(state: Partial<typeof HTTPSApi.state>) {
     HTTPSApi.state = { ...HTTPSApi.state, ...state };
   }
