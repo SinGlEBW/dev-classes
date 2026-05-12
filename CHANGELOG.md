@@ -142,7 +142,7 @@ useEffect(() => {
 ### Added
 - Расширил EventSubscribers
 
-## [1.5.10] - 2026-05-12
+## [1.6.2] - 2026-05-12
 ### Fixed
 - Utils.filterItems исправлен ключ filterKey. 
 ### Added
