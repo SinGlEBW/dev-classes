@@ -6,7 +6,7 @@ export interface DateProcessingProps{
   getClassByDifferenceDay(a:string, b:{className:string, diffDay:number}[]):string
   getMinMaxDate(a:string, b:string, c:string):Record<'minDate' | 'maxDate' | 'minMaxMonth', string >
   splitDateFromTime(a:string):string[]
-  getCorrectDateAndTime(a:string):[string, string]
+  getCorrectDateAndTime(a:string, b?: {removeSecond?: boolean}):[string, string]
   reverseDate(a:string):string
   correctionDataISO8601(a:string):string
   isDateDMY(a:string):boolean

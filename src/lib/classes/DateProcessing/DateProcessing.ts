@@ -52,7 +52,8 @@ export class DateProcessing {
 
   static splitDateFromTime: DateProcessingProps["splitDateFromTime"] = (dateTime) => dateTime.split(dateTime.includes("T") ? "T" : " ");
 
-  static getCorrectDateAndTime: DateProcessingProps["getCorrectDateAndTime"] = (dateTime) => {
+  static getCorrectDateAndTime: DateProcessingProps["getCorrectDateAndTime"] = (dateTime, config) => {
+    const { removeSecond } = config || { removeSecond: true };
     let doubleDot = dateTime.match(/\D/);
     let time, date;
 
@@ -65,7 +66,7 @@ export class DateProcessing {
     date = DateProcessing.correctionDateAndRemoveYear(date, { isYear: true });
     let chunkTime = time.split(":");
     let isNumberSecond = chunkTime.length === 3;
-    if (isNumberSecond) {
+    if (isNumberSecond && removeSecond) {
       chunkTime.length = 2;
       time = chunkTime.join(":");
     }
