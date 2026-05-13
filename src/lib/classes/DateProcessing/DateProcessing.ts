@@ -56,7 +56,7 @@ export class DateProcessing {
     const { removeSecond } = config || { removeSecond: true };
     let doubleDot = dateTime.match(/\D/);
     let time, date;
-
+   
     if (doubleDot && doubleDot[0] === ":") {
       [time, date] = DateProcessing.splitDateFromTime(dateTime);
     } else {
