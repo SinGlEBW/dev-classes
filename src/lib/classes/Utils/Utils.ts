@@ -102,10 +102,27 @@ export class Utils {
     }
     return true;
   };
-  static filterItems = <T extends Array<{ [key in string]: any } & { name: string }>>(list: T, searchQuery: string, config?: { filterKey?: string }):T =>
+  /**
+   * Выполняет фильтрацию массива объектов на основе поискового запроса
+   *
+   * @param list - Исходный массив данных (должен содержать объекты)
+   * @param searchQuery - Строка для поиска (регистронезависимая проверка)
+   * @param config - Дополнительные настройки фильтрации
+   * @param config.filterKey - Ключ свойства объекта, по которому выполняется поиск
+   * @default config.filterKey = 'name'
+   *
+   * @returns Новый массив, содержащий только элементы, у которых значение
+   * по указанному ключу включает поисковую строку
+   *
+   * @example
+   * const users = [{ name: 'John', age: 25 }, { name: 'Jane', age: 30 }];
+   * const result = filterList(users, 'john', { filterKey: 'name' });
+   * // result: [{ name: 'John', age: 25 }]
+   */
+  static filterItems = <T extends any[]>(list: T, searchQuery: string, config?: { filterKey?: keyof T[number] }): T =>
     list.filter((contact) => contact[config?.filterKey || "name"].toLowerCase().includes(searchQuery.toLowerCase())) as T;
 
-  static sortByOnline = <T extends Array<{[key in string]: any} & {name: string, online:boolean}>>(list: T):T => {
+  static sortByOnline = <T extends Array<{ [key in string]: any } & { name: string; online: boolean }>>(list: T): T => {
     const listOnline: (typeof list)[number][] = [];
     const listOther: (typeof list)[number][] = [];
 

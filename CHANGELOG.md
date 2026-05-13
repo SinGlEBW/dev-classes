@@ -148,4 +148,8 @@ useEffect(() => {
 ### Added
 - Добавлен параметр DateProcessingProps.getCorrectDateAndTime removeSecond
 
+## [1.6.4] - 2026-05-13
+### Added
+- Utils.filterItems Добавлена типизация на данный метод 
+
 

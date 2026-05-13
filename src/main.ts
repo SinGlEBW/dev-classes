@@ -1,7 +1,7 @@
 //INFO: HTTPSApi Не верно возвращает данные при ошибке всего лишь
 
-import { DateProcessing } from "@lib";
-(window as any).DateProcessing = DateProcessing;
+import { DateProcessing, Utils } from "@lib";
+
 // const networkTicker = new NetworkStatusTracker(['https://tmk.imis.ru/client/']);
 // await networkTicker.startEvents((info) => {
 //   console.dir(info);
