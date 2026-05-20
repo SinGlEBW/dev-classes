@@ -29,6 +29,7 @@ export interface DateProcessingProps{
   cropSecond(a:string):string
   getRenderDate(a:string, b?:{withOutCurrentYear: boolean} ):'Сегодня' | 'Вчера' | 'Позавчера' | string 
   getCurrentDate():string 
+  getCurrentDateAndTime():string 
   getDaysInMonth(a: number, b: number):number 
   getCurrentYear():number 
   getDateDeviation(date: string, config: Partial<Record<"day" | "month" | "year", number>>): string

@@ -152,4 +152,8 @@ useEffect(() => {
 ### Added
 - Utils.filterItems Добавлена типизация на данный метод 
 
+## [1.6.5] - 2026-05-20
+### Added
+- DateProcessing добавлен метод getCurrentDateAndTime возвращает YYYY-MM-DD HH:MM:SS
+
 

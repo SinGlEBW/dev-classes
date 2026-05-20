@@ -56,7 +56,7 @@ export class DateProcessing {
     const { removeSecond } = config || { removeSecond: true };
     let doubleDot = dateTime.match(/\D/);
     let time, date;
-   
+
     if (doubleDot && doubleDot[0] === ":") {
       [time, date] = DateProcessing.splitDateFromTime(dateTime);
     } else {
@@ -113,8 +113,8 @@ export class DateProcessing {
     return isCurrentYear
       ? DateProcessing.correctionDateAndRemoveYear(date, { isYear: !isCurrentYear })
       : shortYear
-      ? DateProcessing.correctionShortYear(date)
-      : DateProcessing.correctionDateAndRemoveYear(date, { isYear: true });
+        ? DateProcessing.correctionShortYear(date)
+        : DateProcessing.correctionDateAndRemoveYear(date, { isYear: true });
   };
 
   static correctionShortYear: DateProcessingProps["correctionShortYear"] = (date) => {
@@ -167,15 +167,15 @@ export class DateProcessing {
     return diffInDays;
   };
   /**
-  * @param {string} startISODateTime - Начальная дата и время в ISO формате или формате 'YYYY-MM-DD HH:mm:ss'
-  *                                     Пример: '2024-01-15T11:20:00' или '2024-01-15 11:20:00'
-  * @param {string} endISODateTime   - Конечная дата и время в ISO формате или формате 'YYYY-MM-DD HH:mm:ss'
-  *                                     Пример: '2024-02-16T11:27:36' или '2024-02-16 11:27:36'
-  * @returns {TimeDifferenceResult} Объект с результатами
-  * @example
-  * // Разница в 32 дня, 0 часов, 7 минут, 36 секунд
-  * getTimeDifference('2024-01-15T11:20:00', '2024-02-16T11:27:36');
-  */
+   * @param {string} startISODateTime - Начальная дата и время в ISO формате или формате 'YYYY-MM-DD HH:mm:ss'
+   *                                     Пример: '2024-01-15T11:20:00' или '2024-01-15 11:20:00'
+   * @param {string} endISODateTime   - Конечная дата и время в ISO формате или формате 'YYYY-MM-DD HH:mm:ss'
+   *                                     Пример: '2024-02-16T11:27:36' или '2024-02-16 11:27:36'
+   * @returns {TimeDifferenceResult} Объект с результатами
+   * @example
+   * // Разница в 32 дня, 0 часов, 7 минут, 36 секунд
+   * getTimeDifference('2024-01-15T11:20:00', '2024-02-16T11:27:36');
+   */
   static calculateTimeDifference: DateProcessingProps["calculateTimeDifference"] = (startISODateTime, endISODateTime) => {
     const start = new Date(startISODateTime) as any;
     const end = new Date(endISODateTime) as any;
@@ -271,6 +271,18 @@ export class DateProcessing {
         return DateProcessing.correctionDate(date, { shortYear: true, withOutCurrentYear });
     }
   };
+
+  static getCurrentDateAndTime: DateProcessingProps["getCurrentDateAndTime"] = (timezone = 'Europe/Moscow', locale = 'sv-SE') => {
+    return new Date().toLocaleString(locale, {
+        timeZone: timezone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+    }).replace(' ', ' ');
+}
 
   static getCurrentDate: DateProcessingProps["getCurrentDate"] = () => {
     const date = new Date();
