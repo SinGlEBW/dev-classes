@@ -21,6 +21,8 @@ export interface DateProcessingProps{
   calculateTimeDifference(a:string, b: string):Record<'days' | 'hours' | 'minutes' | 'seconds' | 'totalSeconds', number> & Record<'formatted' | 'formattedShort', string>
   hasDateLessInNumber(a:string, b: string, c:number):boolean
   correctionCurrentYear(a:[string], b?:number):string[]
+  sortDataByDate<T extends {[key in string]: any}>(data:T[], keyDate: keyof T): T[];
+
   getChunkFromDate(a:string, b:'day' | 'month' | 'year', c?:{isBeforeZero:boolean}):string
   getNameMonthByNumber(a:number):(typeof itemsMonths)[number]
   minMaxMountStr(a:Record<'minDate' | 'maxDate', string>): {minMaxMonth: string}

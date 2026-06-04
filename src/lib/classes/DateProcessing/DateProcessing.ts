@@ -217,7 +217,9 @@ export class DateProcessing {
       return flag ? `${yearNumber - 1}-${period}` : `${year}-${period}`;
     });
   };
-
+  static sortDataByDate:DateProcessingProps["sortDataByDate"] = (data, keyDate) => {
+    return data.sort((item1, item2) => (DateProcessing.hasDateLessPeriod(item2[keyDate], item1[keyDate]) ? 1 : -1));
+  };
   static getChunkFromDate: DateProcessingProps["getChunkFromDate"] = (date, chunk, option) => {
     date = DateProcessing.correctionDataISO8601(date);
 

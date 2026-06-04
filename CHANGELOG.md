@@ -156,4 +156,8 @@ useEffect(() => {
 ### Added
 - DateProcessing добавлен метод getCurrentDateAndTime возвращает YYYY-MM-DD HH:MM:SS
 
+## [1.6.7] - 2026-06-04
+### Added
+- ControlState для использования в разных классах где должен быть state
+
 
