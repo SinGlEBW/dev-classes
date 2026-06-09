@@ -160,4 +160,8 @@ useEffect(() => {
 ### Added
 - ControlState для использования в разных классах где должен быть state
 
+## [1.6.8] - 2026-06-09
+### Fixed
+- Utils filterItems исправлена типизация
+
 

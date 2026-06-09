@@ -64,8 +64,11 @@ export class Utils {
    * const result = filterList(users, 'john', { filterKey: 'name' });
    * // result: [{ name: 'John', age: 25 }]
    */
-  static filterItems: UtilsProps["filterItems"] = (list, searchQuery, config) =>
-    list.filter((contact) => (contact[config?.filterKey || "name"] as string).toLowerCase().includes(searchQuery.toLowerCase()));
+  static filterItems: UtilsProps["filterItems"] = (list, searchQuery, config) => {
+
+    const result = list.filter((item) => (item[config?.filterKey as string|| "name"] as string).toLowerCase().includes(searchQuery.toLowerCase()));
+    return result;
+  }
 
   static sortByOnline: UtilsProps["sortByOnline"] = (list) => {
     const listOnline: (typeof list)[number][] = [];
